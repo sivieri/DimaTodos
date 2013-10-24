@@ -11,5 +11,7 @@
     <string name="note_activity">Edit note</string>
     <string name="note_saved">Note saved</string>
     <string name="note_discarded">Note discarded</string>
+    <string name="note_context_edit">Edit...</string>
+    <string name="note_context_delete">Delete</string>
 
 </resources>
