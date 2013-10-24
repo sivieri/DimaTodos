@@ -4,5 +4,7 @@
     <string name="app_name">DimaTodos</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
+    <string name="add_note">Add note</string>
+    <string name="list_name">title</string>
 
 </resources>

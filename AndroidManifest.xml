@@ -22,6 +22,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <provider android:authorities="me.sivieri.dimatodos" android:name="NotesContentProvider"
+            android:exported="false"></provider>
     </application>
 
 </manifest>
