@@ -1,5 +1,6 @@
 package me.sivieri.dimatodos;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -9,6 +10,7 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
@@ -44,6 +46,20 @@ public class MainActivity extends FragmentActivity implements LoaderCallbacks<Cu
 		getMenuInflater().inflate(R.menu.main, menu);
 
 		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+			case R.id.add_note:
+				Intent i = new Intent(this, NoteActivity.class);
+				startActivity(i);
+				return true;
+			case R.id.settings:
+				return true;
+			default:
+				return super.onOptionsItemSelected(item);
+		}
 	}
 
 	@Override

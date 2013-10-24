@@ -6,5 +6,10 @@
     <string name="hello_world">Hello world!</string>
     <string name="add_note">Add note</string>
     <string name="list_name">title</string>
+    <string name="note_title_hint">Note title</string>
+    <string name="note_content_hint">Note content</string>
+    <string name="note_activity">Edit note</string>
+    <string name="note_saved">Note saved</string>
+    <string name="note_discarded">Note discarded</string>
 
 </resources>

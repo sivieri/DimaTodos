@@ -44,8 +44,19 @@ public class NotesContentProvider extends ContentProvider {
 	}
 
 	@Override
-	public Uri insert(Uri arg0, ContentValues arg1) {
-		return null;
+	public Uri insert(Uri uri, ContentValues values) {
+		int uriType = sURIMatcher.match(uri);
+		SQLiteDatabase sqlDB = this.database.getWritableDatabase();
+		long id = 0;
+		switch (uriType) {
+			case NOTES:
+				id = sqlDB.insert(NotesOpenHelper.TABLE_NAME, null, values);
+				break;
+			default:
+				throw new IllegalArgumentException("Unknown URI: " + uri);
+		}
+		getContext().getContentResolver().notifyChange(uri, null);
+		return Uri.parse(BASE_PATH + "/" + id);
 	}
 
 	@Override
@@ -59,7 +70,7 @@ public class NotesContentProvider extends ContentProvider {
 	public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
 		SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
 		checkColumns(projection);
-		queryBuilder.setTables(NotesOpenHelper.DATABASE_NAME);
+		queryBuilder.setTables(NotesOpenHelper.TABLE_NAME);
 
 		int uriType = sURIMatcher.match(uri);
 		switch (uriType) {

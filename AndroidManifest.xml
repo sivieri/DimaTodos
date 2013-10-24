@@ -24,6 +24,7 @@
         </activity>
         <provider android:authorities="me.sivieri.dimatodos" android:name="NotesContentProvider"
             android:exported="false"></provider>
+        <activity android:name="NoteActivity" android:label="@string/note_activity"></activity>
     </application>
 
 </manifest>
