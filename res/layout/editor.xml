@@ -4,20 +4,54 @@
     android:layout_height="fill_parent"
     android:orientation="vertical" >
 
-    <EditText
-        android:id="@+id/titleText"
+    <ViewSwitcher
+        android:id="@+id/titleView"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:hint="@string/note_title_hint"
-        android:textStyle="bold" />
+        android:layout_height="wrap_content" >
 
-    <EditText
-        android:id="@+id/contentText"
+        <TextView
+            android:id="@+id/titleText"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="@string/note_title_hint"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/titleTextEdit"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="@string/note_title_hint"
+            android:textStyle="bold" >
+
+            <requestFocus />
+        </EditText>
+
+    </ViewSwitcher>
+
+    <ViewSwitcher
+        android:id="@+id/contentView"
         android:layout_width="fill_parent"
         android:layout_height="0dp"
-        android:layout_gravity="top"
-        android:layout_weight="1"
-        android:gravity="top"
-        android:hint="@string/note_content_hint" />
+        android:layout_weight="1" >
+
+        <TextView
+            android:id="@+id/contentText"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:gravity="top"
+            android:hint="@string/note_content_hint" />
+
+        <EditText
+            android:id="@+id/contentTextEdit"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:gravity="top"
+            android:hint="@string/note_content_hint" />
+
+    </ViewSwitcher>
 
 </LinearLayout>

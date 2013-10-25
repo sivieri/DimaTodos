@@ -57,6 +57,7 @@ public class MainActivity extends FragmentActivity implements LoaderCallbacks<Cu
 		switch (item.getItemId()) {
 			case R.id.add_note:
 				Intent i = new Intent(this, NoteActivity.class);
+				i.putExtra(NoteActivity.EDIT, true);
 				startActivity(i);
 				return true;
 			case R.id.settings:

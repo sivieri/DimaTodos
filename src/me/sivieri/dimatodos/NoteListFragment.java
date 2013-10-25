@@ -13,6 +13,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView.AdapterContextMenuInfo;
+import android.widget.ListView;
 
 public class NoteListFragment extends ListFragment {
 
@@ -39,6 +40,7 @@ public class NoteListFragment extends ListFragment {
 				Intent i = new Intent(getActivity(), NoteActivity.class);
 				Uri uri = Uri.parse(NotesContentProvider.CONTENT_URI + "/" + info.id);
 				i.putExtra(NOTE_ID, uri);
+				i.putExtra(NoteActivity.EDIT, true);
 				startActivity(i);
 				return true;
 			case R.id.note_context_delete:
@@ -68,4 +70,13 @@ public class NoteListFragment extends ListFragment {
 				return super.onContextItemSelected(item);
 		}
 	}
+
+	@Override
+	public void onListItemClick(ListView l, View v, int position, long id) {
+		Intent i = new Intent(getActivity(), NoteActivity.class);
+		Uri uri = Uri.parse(NotesContentProvider.CONTENT_URI + "/" + id);
+		i.putExtra(NOTE_ID, uri);
+		startActivity(i);
+	}
+
 }
