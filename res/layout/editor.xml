@@ -11,7 +11,12 @@
         
         <RelativeLayout
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content" >
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="5dp" >
             
             <ImageButton
                 android:id="@+id/editButton"
@@ -38,6 +43,11 @@
             android:id="@+id/titleTextEdit"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="5dp"
             android:ems="10"
             android:hint="@string/note_title_hint"
             android:textStyle="bold" >
@@ -56,7 +66,12 @@
         <TextView
             android:id="@+id/contentText"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="fill_parent"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="5dp"
             android:ems="10"
             android:gravity="top"
             android:hint="@string/note_content_hint" />
@@ -64,7 +79,12 @@
         <EditText
             android:id="@+id/contentTextEdit"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="fill_parent"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="5dp"
             android:ems="10"
             android:gravity="top"
             android:hint="@string/note_content_hint" />
