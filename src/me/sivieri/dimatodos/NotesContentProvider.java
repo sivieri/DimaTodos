@@ -11,6 +11,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
+import android.text.TextUtils;
 
 public class NotesContentProvider extends ContentProvider {
 
@@ -91,8 +92,29 @@ public class NotesContentProvider extends ContentProvider {
 	}
 
 	@Override
-	public int update(Uri arg0, ContentValues arg1, String arg2, String[] arg3) {
-		return 0;
+	public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+		int uriType = sURIMatcher.match(uri);
+		SQLiteDatabase sqlDB = this.database.getWritableDatabase();
+		int rowsUpdated = 0;
+		switch (uriType) {
+			case NOTES:
+				rowsUpdated = sqlDB.update(NotesOpenHelper.TABLE_NAME, values, selection, selectionArgs);
+				break;
+			case NOTE_ID:
+				String id = uri.getLastPathSegment();
+				if (TextUtils.isEmpty(selection)) {
+					rowsUpdated = sqlDB.update(NotesOpenHelper.TABLE_NAME, values, NotesOpenHelper.ID + "=" + id, null);
+				}
+				else {
+					rowsUpdated = sqlDB.update(NotesOpenHelper.TABLE_NAME, values, NotesOpenHelper.ID + "=" + id + " and " + selection, selectionArgs);
+				}
+				break;
+			default:
+				throw new IllegalArgumentException("Unknown URI: " + uri);
+		}
+		getContext().getContentResolver().notifyChange(uri, null);
+
+		return rowsUpdated;
 	}
 
 	private void checkColumns(String[] projection) {

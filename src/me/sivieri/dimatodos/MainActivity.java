@@ -11,12 +11,16 @@ import android.support.v4.content.Loader;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
 public class MainActivity extends FragmentActivity implements LoaderCallbacks<Cursor> {
 
+	public static final String TAG = "dimatodos";
+
 	private SimpleCursorAdapter mAdapter;
+	private ProgressBar progressBar;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -24,13 +28,13 @@ public class MainActivity extends FragmentActivity implements LoaderCallbacks<Cu
 		setContentView(R.layout.activity_main);
 		ListFragment listFragment = (ListFragment) getSupportFragmentManager().findFragmentById(R.id.notesfragment);
 
-		ProgressBar progressBar = new ProgressBar(this);
-		progressBar.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-		progressBar.setIndeterminate(true);
-		listFragment.getListView().setEmptyView(progressBar);
+		this.progressBar = new ProgressBar(this);
+		this.progressBar.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+		this.progressBar.setIndeterminate(true);
+		listFragment.getListView().setEmptyView(this.progressBar);
 
 		ViewGroup root = (ViewGroup) findViewById(android.R.id.content);
-		root.addView(progressBar);
+		root.addView(this.progressBar);
 
 		String[] fromColumns = { getString(R.string.list_name) };
 		int[] toViews = { android.R.id.text1 };
@@ -71,6 +75,9 @@ public class MainActivity extends FragmentActivity implements LoaderCallbacks<Cu
 	@Override
 	public void onLoadFinished(Loader<Cursor> arg0, Cursor arg1) {
 		this.mAdapter.swapCursor(arg1);
+		if (arg1.getCount() == 0) {
+			this.progressBar.setVisibility(View.GONE);
+		}
 	}
 
 	@Override
