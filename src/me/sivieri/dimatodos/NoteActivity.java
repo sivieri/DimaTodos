@@ -4,11 +4,14 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.method.ScrollingMovementMethod;
+import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.Scroller;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
@@ -24,6 +27,24 @@ public class NoteActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.editor);
+		TextView titleText = (TextView) findViewById(R.id.titleText);
+		TextView contentText = (TextView) findViewById(R.id.contentText);
+		EditText titleTextEdit = (EditText) findViewById(R.id.titleTextEdit);
+		EditText contentTextEdit = (EditText) findViewById(R.id.contentTextEdit);
+		final ViewSwitcher titleView = (ViewSwitcher) findViewById(R.id.titleView);
+		final ViewSwitcher contentView = (ViewSwitcher) findViewById(R.id.contentView);
+		titleText.setScroller(new Scroller(this));
+		titleText.setVerticalScrollBarEnabled(true);
+		titleText.setMovementMethod(new ScrollingMovementMethod());
+		contentText.setScroller(new Scroller(this));
+		contentText.setVerticalScrollBarEnabled(true);
+		contentText.setMovementMethod(new ScrollingMovementMethod());
+		titleTextEdit.setScroller(new Scroller(this));
+		titleTextEdit.setVerticalScrollBarEnabled(true);
+		titleTextEdit.setMovementMethod(new ScrollingMovementMethod());
+		contentTextEdit.setScroller(new Scroller(this));
+		contentTextEdit.setVerticalScrollBarEnabled(true);
+		contentTextEdit.setMovementMethod(new ScrollingMovementMethod());
 		Bundle extras = getIntent().getExtras();
 		if (extras != null) {
 			this.uri = (Uri) extras.getParcelable(NoteListFragment.NOTE_ID);
@@ -35,10 +56,6 @@ public class NoteActivity extends Activity {
 					cursor.moveToFirst();
 					String title = cursor.getString(cursor.getColumnIndexOrThrow(NotesOpenHelper.KEY));
 					String content = cursor.getString(cursor.getColumnIndexOrThrow(NotesOpenHelper.VALUE));
-					TextView titleText = (TextView) findViewById(R.id.titleText);
-					TextView contentText = (TextView) findViewById(R.id.contentText);
-					EditText titleTextEdit = (EditText) findViewById(R.id.titleTextEdit);
-					EditText contentTextEdit = (EditText) findViewById(R.id.contentTextEdit);
 					titleText.setText(title);
 					contentText.setText(content);
 					titleTextEdit.setText(title);
@@ -47,12 +64,21 @@ public class NoteActivity extends Activity {
 				}
 			}
 			if (this.edit) {
-				ViewSwitcher titleView = (ViewSwitcher) findViewById(R.id.titleView);
-				ViewSwitcher contentView = (ViewSwitcher) findViewById(R.id.contentView);
 				titleView.showNext();
 				contentView.showNext();
 			}
 		}
+		ImageButton button = (ImageButton) findViewById(R.id.editButton);
+		button.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				NoteActivity.this.edit = true;
+				titleView.showNext();
+				contentView.showNext();
+			}
+
+		});
 	}
 
 	@Override
@@ -73,7 +99,7 @@ public class NoteActivity extends Activity {
 					AlertDialog.Builder builder = new AlertDialog.Builder(this);
 					builder.setTitle(getString(R.string.delete_dialog_title));
 					builder.setMessage(getString(R.string.delete_dialog_content));
-					builder.setPositiveButton(getString(R.string.delete_dialog_yes), new OnClickListener() {
+					builder.setPositiveButton(getString(R.string.delete_dialog_yes), new DialogInterface.OnClickListener() {
 
 						@Override
 						public void onClick(DialogInterface arg0, int arg1) {
@@ -82,7 +108,7 @@ public class NoteActivity extends Activity {
 						}
 
 					});
-					builder.setNegativeButton(getString(R.string.delete_dialog_no), new OnClickListener() {
+					builder.setNegativeButton(getString(R.string.delete_dialog_no), new DialogInterface.OnClickListener() {
 
 						@Override
 						public void onClick(DialogInterface arg0, int arg1) {
