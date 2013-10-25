@@ -35,8 +35,29 @@ public class NotesContentProvider extends ContentProvider {
 	}
 
 	@Override
-	public int delete(Uri arg0, String arg1, String[] arg2) {
-		return 0;
+	public int delete(Uri uri, String selection, String[] selectionArgs) {
+		int uriType = sURIMatcher.match(uri);
+		SQLiteDatabase sqlDB = this.database.getWritableDatabase();
+		int rowsDeleted = 0;
+		switch (uriType) {
+			case NOTES:
+				rowsDeleted = sqlDB.delete(NotesOpenHelper.TABLE_NAME, selection, selectionArgs);
+				break;
+			case NOTE_ID:
+				String id = uri.getLastPathSegment();
+				if (TextUtils.isEmpty(selection)) {
+					rowsDeleted = sqlDB.delete(NotesOpenHelper.TABLE_NAME, NotesOpenHelper.ID + "=" + id, null);
+				}
+				else {
+					rowsDeleted = sqlDB.delete(NotesOpenHelper.TABLE_NAME, NotesOpenHelper.ID + "=" + id + " and " + selection, selectionArgs);
+				}
+				break;
+			default:
+				throw new IllegalArgumentException("Unknown URI: " + uri);
+		}
+		getContext().getContentResolver().notifyChange(uri, null);
+
+		return rowsDeleted;
 	}
 
 	@Override

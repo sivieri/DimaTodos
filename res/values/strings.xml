@@ -13,5 +13,9 @@
     <string name="note_discarded">Note discarded</string>
     <string name="note_context_edit">Edit...</string>
     <string name="note_context_delete">Delete</string>
+    <string name="delete_dialog_title">Delete note</string>
+    <string name="delete_dialog_content">Delete the selected note?</string>
+    <string name="delete_dialog_yes">Yes</string>
+    <string name="delete_dialog_no">No</string>
 
 </resources>

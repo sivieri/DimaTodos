@@ -1,5 +1,8 @@
 package me.sivieri.dimatodos;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -30,7 +33,7 @@ public class NoteListFragment extends ListFragment {
 
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
-		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
+		final AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
 		switch (item.getItemId()) {
 			case R.id.note_context_edit:
 				Intent i = new Intent(getActivity(), NoteActivity.class);
@@ -39,7 +42,27 @@ public class NoteListFragment extends ListFragment {
 				startActivity(i);
 				return true;
 			case R.id.note_context_delete:
+				AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+				builder.setTitle(getString(R.string.delete_dialog_title));
+				builder.setMessage(getString(R.string.delete_dialog_content));
+				builder.setPositiveButton(getString(R.string.delete_dialog_yes), new OnClickListener() {
 
+					@Override
+					public void onClick(DialogInterface arg0, int arg1) {
+						Uri uri = Uri.parse(NotesContentProvider.CONTENT_URI + "/" + info.id);
+						getActivity().getContentResolver().delete(uri, null, null);
+					}
+
+				});
+				builder.setNegativeButton(getString(R.string.delete_dialog_no), new OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface arg0, int arg1) {
+						// don't do anything...
+					}
+
+				});
+				builder.show();
 				return true;
 			default:
 				return super.onContextItemSelected(item);
