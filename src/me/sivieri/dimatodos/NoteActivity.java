@@ -8,6 +8,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -131,7 +132,9 @@ public class NoteActivity extends Activity {
 				values.put(NotesOpenHelper.KEY, title);
 				values.put(NotesOpenHelper.VALUE, content);
 				if (this.uri == null) {
-					getContentResolver().insert(NotesContentProvider.CONTENT_URI, values);
+					Uri partial = getContentResolver().insert(NotesContentProvider.CONTENT_URI, values);
+					this.uri = Uri.parse("content://" + NotesContentProvider.AUTHORITY + "/" + partial);
+					Log.d(MainActivity.TAG, this.uri.toString());
 				}
 				else {
 					getContentResolver().update(this.uri, values, null, null);

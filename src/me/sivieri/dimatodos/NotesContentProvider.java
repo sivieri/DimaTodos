@@ -17,7 +17,7 @@ public class NotesContentProvider extends ContentProvider {
 
 	static final String TAG = "dimatodos";
 
-	private static final String AUTHORITY = "me.sivieri.dimatodos";
+	static final String AUTHORITY = "me.sivieri.dimatodos";
 	private static final String BASE_PATH = "notes";
 	private static final int NOTES = 10;
 	private static final int NOTE_ID = 20;
