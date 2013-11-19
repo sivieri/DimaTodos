@@ -16,10 +16,11 @@ public class NotesOpenHelper extends SQLiteOpenHelper {
 	static final String LAT = "lat";
 	static final String LNG = "lng";
 	private static final String TABLE_CREATE = "CREATE TABLE " + TABLE_NAME + " (" + ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + KEY + " TEXT, " + VALUE + " TEXT," + TIMESTAMP
-	        + "DATETIME DEFAULT CURRENT_TIMESTAMP, " + LAT + " double DEFAULT 0, " + LNG + " double DEFAULT 0);";
+	        + " DATETIME DEFAULT CURRENT_TIMESTAMP, " + LAT + " double DEFAULT 0, " + LNG + " double DEFAULT 0);";
 	private static final String WELCOME_MSG = "INSERT INTO " + TABLE_NAME + "(" + KEY + ", " + VALUE
 	        + ") VALUES ('Welcome', 'Welcome to the todo/notes app for Design and Implementation of Mobile Applications (DIMA) course!')";
-	private static final String UPGRADE_3_TO_4 = "ALTER TABLE " + TABLE_NAME + " ADD COLUMN " + LAT + " double DEFAULT 0;" + "ALTER TABLE " + TABLE_NAME + " ADD COLUMN " + LNG + " double DEFAULT 0;";
+	private static final String UPGRADE_3_TO_4_P1 = "ALTER TABLE " + TABLE_NAME + " ADD COLUMN " + LAT + " double DEFAULT 0;";
+	private static final String UPGRADE_3_TO_4_P2 = "ALTER TABLE " + TABLE_NAME + " ADD COLUMN " + LNG + " double DEFAULT 0;";
 
 	public NotesOpenHelper(Context context) {
 		super(context, TABLE_NAME, null, TABLE_VERSION);
@@ -36,7 +37,8 @@ public class NotesOpenHelper extends SQLiteOpenHelper {
 	public void onUpgrade(SQLiteDatabase arg0, int arg1, int arg2) {
 		Log.i(MainActivity.TAG, "Upgrade from " + arg1 + " to " + arg2);
 		if (arg1 == 3 && arg2 == 4) {
-			arg0.execSQL(UPGRADE_3_TO_4);
+			arg0.execSQL(UPGRADE_3_TO_4_P1);
+			arg0.execSQL(UPGRADE_3_TO_4_P2);
 		}
 		else {
 			arg0.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
