@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.database.Cursor;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
@@ -17,16 +18,25 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
-public class NoteActivity extends Activity {
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesClient;
+import com.google.android.gms.location.LocationClient;
 
+public class NoteActivity extends Activity implements GooglePlayServicesClient.ConnectionCallbacks, GooglePlayServicesClient.OnConnectionFailedListener {
+
+	public static final String LOCATION = "location";
 	public static final String EDIT = "edit";
 
 	private Uri uri = null;
 	private boolean edit = false;
+	private boolean getLocation = false;
+	private LocationClient locationClient = null;
+	private Location location = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		this.locationClient = new LocationClient(this, this, this);
 		setContentView(R.layout.editor);
 		TextView titleText = (TextView) findViewById(R.id.titleText);
 		TextView contentText = (TextView) findViewById(R.id.contentText);
@@ -50,6 +60,7 @@ public class NoteActivity extends Activity {
 		if (extras != null) {
 			this.uri = (Uri) extras.getParcelable(NoteListFragment.NOTE_ID);
 			this.edit = extras.getBoolean(EDIT);
+			this.getLocation = extras.getBoolean(LOCATION);
 			if (this.uri != null) {
 				String[] projection = { NotesOpenHelper.KEY, NotesOpenHelper.VALUE };
 				Cursor cursor = getContentResolver().query(this.uri, projection, null, null, null);
@@ -80,6 +91,22 @@ public class NoteActivity extends Activity {
 			}
 
 		});
+	}
+
+	@Override
+	protected void onStart() {
+		super.onStart();
+		if (this.getLocation) {
+			this.locationClient.connect();
+		}
+	}
+
+	@Override
+	protected void onStop() {
+		if (this.getLocation) {
+			this.locationClient.disconnect();
+		}
+		super.onStop();
 	}
 
 	@Override
@@ -131,6 +158,10 @@ public class NoteActivity extends Activity {
 				ContentValues values = new ContentValues();
 				values.put(NotesOpenHelper.KEY, title);
 				values.put(NotesOpenHelper.VALUE, content);
+				if (this.location != null) {
+					values.put(NotesOpenHelper.LAT, this.location.getLatitude());
+					values.put(NotesOpenHelper.LNG, this.location.getLongitude());
+				}
 				if (this.uri == null) {
 					Uri partial = getContentResolver().insert(NotesContentProvider.CONTENT_URI, values);
 					this.uri = Uri.parse("content://" + NotesContentProvider.AUTHORITY + "/" + partial);
@@ -160,6 +191,22 @@ public class NoteActivity extends Activity {
 		else {
 			return string;
 		}
+	}
+
+	@Override
+	public void onConnectionFailed(ConnectionResult result) {
+		Log.e(MainActivity.TAG, "Location error " + result.getErrorCode());
+	}
+
+	@Override
+	public void onConnected(Bundle connectionHint) {
+		this.location = this.locationClient.getLastLocation();
+		this.locationClient.disconnect();
+	}
+
+	@Override
+	public void onDisconnected() {
+		Log.i(MainActivity.TAG, "Location disconnected");
 	}
 
 }

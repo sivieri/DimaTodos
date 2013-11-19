@@ -1,5 +1,6 @@
 package me.sivieri.dimatodos;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -15,10 +16,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+
 public class MainActivity extends FragmentActivity implements LoaderCallbacks<Cursor> {
 
 	public static final String TAG = "dimatodos";
 
+	private static final int PLAY_ERROR = 1;
+
+	private LocationState locationState = LocationState.FIRST;
 	private SimpleCursorAdapter mAdapter;
 	private ProgressBar progressBar;
 
@@ -46,6 +53,34 @@ public class MainActivity extends FragmentActivity implements LoaderCallbacks<Cu
 	}
 
 	@Override
+	protected void onResume() {
+		super.onResume();
+		int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+		if (resultCode != ConnectionResult.SUCCESS && this.locationState == LocationState.FIRST) {
+			GooglePlayServicesUtil.getErrorDialog(resultCode, this, PLAY_ERROR).show();
+		}
+	}
+
+	@Override
+	protected void onActivityResult(int arg0, int arg1, Intent arg2) {
+		switch (arg0) {
+			case PLAY_ERROR:
+				switch (arg1) {
+					case Activity.RESULT_OK:
+						this.locationState = LocationState.SET;
+						break;
+					default:
+						this.locationState = LocationState.UNSET;
+						break;
+				}
+				break;
+			default:
+				// really?
+				break;
+		}
+	}
+
+	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.main, menu);
 
@@ -58,6 +93,9 @@ public class MainActivity extends FragmentActivity implements LoaderCallbacks<Cu
 			case R.id.add_note:
 				Intent i = new Intent(this, NoteActivity.class);
 				i.putExtra(NoteActivity.EDIT, true);
+				if (this.locationState == LocationState.SET) {
+					i.putExtra(NoteActivity.LOCATION, true);
+				}
 				startActivity(i);
 				return true;
 			case R.id.settings:
@@ -84,6 +122,10 @@ public class MainActivity extends FragmentActivity implements LoaderCallbacks<Cu
 	@Override
 	public void onLoaderReset(Loader<Cursor> arg0) {
 		this.mAdapter.swapCursor(null);
+	}
+
+	static enum LocationState {
+		FIRST, SET, UNSET
 	}
 
 }
