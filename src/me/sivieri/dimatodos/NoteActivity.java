@@ -95,6 +95,7 @@ public class NoteActivity extends Activity {
 			if (title.length() == 0 && content.length() == 0) {
 				if (this.uri == null) {
 					Toast.makeText(getApplicationContext(), getString(R.string.note_discarded), Toast.LENGTH_SHORT).show();
+					super.finish();
 				}
 				else {
 					AlertDialog.Builder builder = new AlertDialog.Builder(this);
