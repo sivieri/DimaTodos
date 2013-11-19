@@ -3,6 +3,7 @@ package me.sivieri.dimatodos;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 public class NotesOpenHelper extends SQLiteOpenHelper {
 
@@ -26,12 +27,14 @@ public class NotesOpenHelper extends SQLiteOpenHelper {
 
 	@Override
 	public void onCreate(SQLiteDatabase arg0) {
+		Log.i(MainActivity.TAG, "Creating the db");
 		arg0.execSQL(TABLE_CREATE);
 		arg0.execSQL(WELCOME_MSG);
 	}
 
 	@Override
 	public void onUpgrade(SQLiteDatabase arg0, int arg1, int arg2) {
+		Log.i(MainActivity.TAG, "Upgrade from " + arg1 + " to " + arg2);
 		if (arg1 == 3 && arg2 == 4) {
 			arg0.execSQL(UPGRADE_3_TO_4);
 		}

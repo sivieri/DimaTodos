@@ -18,5 +18,6 @@
     <string name="delete_dialog_yes">Yes</string>
     <string name="delete_dialog_no">No</string>
     <string name="edit_button">Edit note</string>
+    <string name="show_location">Show creation location</string>
 
 </resources>

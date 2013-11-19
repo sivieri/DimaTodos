@@ -1,15 +1,20 @@
 package me.sivieri.dimatodos;
 
+import java.util.Locale;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -31,7 +36,8 @@ public class NoteActivity extends Activity implements GooglePlayServicesClient.C
 	private boolean edit = false;
 	private boolean getLocation = false;
 	private LocationClient locationClient = null;
-	private Location location = null;
+	private double latitude = 0;
+	private double longitude = 0;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -62,12 +68,14 @@ public class NoteActivity extends Activity implements GooglePlayServicesClient.C
 			this.edit = extras.getBoolean(EDIT);
 			this.getLocation = extras.getBoolean(LOCATION);
 			if (this.uri != null) {
-				String[] projection = { NotesOpenHelper.KEY, NotesOpenHelper.VALUE };
+				String[] projection = { NotesOpenHelper.KEY, NotesOpenHelper.VALUE, NotesOpenHelper.LAT, NotesOpenHelper.LNG };
 				Cursor cursor = getContentResolver().query(this.uri, projection, null, null, null);
 				if (cursor != null) {
 					cursor.moveToFirst();
 					String title = cursor.getString(cursor.getColumnIndexOrThrow(NotesOpenHelper.KEY));
 					String content = cursor.getString(cursor.getColumnIndexOrThrow(NotesOpenHelper.VALUE));
+					this.latitude = cursor.getDouble(cursor.getColumnIndexOrThrow(NotesOpenHelper.LAT));
+					this.longitude = cursor.getDouble(cursor.getColumnIndexOrThrow(NotesOpenHelper.LNG));
 					titleText.setText(title);
 					contentText.setText(content);
 					titleTextEdit.setText(title);
@@ -159,10 +167,8 @@ public class NoteActivity extends Activity implements GooglePlayServicesClient.C
 				ContentValues values = new ContentValues();
 				values.put(NotesOpenHelper.KEY, title);
 				values.put(NotesOpenHelper.VALUE, content);
-				if (this.location != null) {
-					values.put(NotesOpenHelper.LAT, this.location.getLatitude());
-					values.put(NotesOpenHelper.LNG, this.location.getLongitude());
-				}
+				values.put(NotesOpenHelper.LAT, this.latitude);
+				values.put(NotesOpenHelper.LNG, this.longitude);
 				if (this.uri == null) {
 					Uri partial = getContentResolver().insert(NotesContentProvider.CONTENT_URI, values);
 					this.uri = Uri.parse("content://" + NotesContentProvider.AUTHORITY + "/" + partial);
@@ -195,13 +201,40 @@ public class NoteActivity extends Activity implements GooglePlayServicesClient.C
 	}
 
 	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.editor, menu);
+
+		return true;
+	}
+
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu) {
+		return !this.edit;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+			case R.id.show_location:
+				String uri = String.format(Locale.ENGLISH, "geo:%f,%f", this.latitude, this.longitude);
+				Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+				startActivity(intent);
+				return true;
+			default:
+				return super.onOptionsItemSelected(item);
+		}
+	}
+
+	@Override
 	public void onConnectionFailed(ConnectionResult result) {
 		Log.e(MainActivity.TAG, "Location error " + result.getErrorCode());
 	}
 
 	@Override
 	public void onConnected(Bundle connectionHint) {
-		this.location = this.locationClient.getLastLocation();
+		Location location = this.locationClient.getLastLocation();
+		this.latitude = location.getLatitude();
+		this.longitude = location.getLongitude();
 		this.locationClient.disconnect();
 	}
 
