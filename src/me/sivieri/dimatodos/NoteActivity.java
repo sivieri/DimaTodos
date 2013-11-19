@@ -235,6 +235,7 @@ public class NoteActivity extends Activity implements GooglePlayServicesClient.C
 		Location location = this.locationClient.getLastLocation();
 		this.latitude = location.getLatitude();
 		this.longitude = location.getLongitude();
+		Log.i(MainActivity.TAG, "Got a location at " + this.latitude + ", " + this.longitude);
 		this.locationClient.disconnect();
 	}
 
