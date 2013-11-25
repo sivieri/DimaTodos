@@ -8,7 +8,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
@@ -19,6 +18,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentActivity;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.Menu;
@@ -36,7 +37,7 @@ import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.location.LocationClient;
 import com.google.common.io.ByteStreams;
 
-public class NoteActivity extends Activity implements GooglePlayServicesClient.ConnectionCallbacks, GooglePlayServicesClient.OnConnectionFailedListener {
+public class NoteActivity extends FragmentActivity implements GooglePlayServicesClient.ConnectionCallbacks, GooglePlayServicesClient.OnConnectionFailedListener {
 
 	public static final String LOCATION = "location";
 	public static final String EDIT = "edit";
@@ -228,9 +229,17 @@ public class NoteActivity extends Activity implements GooglePlayServicesClient.C
 			case R.id.add_image:
 				addImage();
 				return true;
+			case R.id.show_attachments:
+				showAttachments();
+				return true;
 			default:
 				return super.onOptionsItemSelected(item);
 		}
+	}
+
+	private void showAttachments() {
+		DialogFragment dialog = AttachmentDialogFragment.newInstance(this.uri.getLastPathSegment());
+		dialog.show(getSupportFragmentManager(), "dialog");
 	}
 
 	@Override

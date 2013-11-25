@@ -20,5 +20,6 @@
     <string name="edit_button">Edit note</string>
     <string name="show_location">Show creation location</string>
     <string name="add_image">Add image...</string>
+    <string name="show_attachments">Show attachments</string>
 
 </resources>
