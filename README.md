@@ -13,4 +13,5 @@ Android app tutorial for DIMA 2013 @ PoliMi
 # Lesson 2
 * DimaTodos content provider (continued)
 * DimaTodos note editor
-* ...
+* GPS and Location API (Google Play Services)
+* External intents through URIs
