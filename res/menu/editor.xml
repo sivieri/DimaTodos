@@ -1,4 +1,5 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
+    <item android:id="@+id/add_image" android:title="@string/add_image" android:showAsAction="never"></item>
     <item android:id="@+id/show_location" android:title="@string/show_location" android:showAsAction="never"></item>
 </menu>

@@ -1,5 +1,8 @@
 package me.sivieri.dimatodos;
 
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Locale;
 
 import android.app.Activity;
@@ -11,6 +14,8 @@ import android.database.Cursor;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.Menu;
@@ -31,6 +36,8 @@ public class NoteActivity extends Activity implements GooglePlayServicesClient.C
 
 	public static final String LOCATION = "location";
 	public static final String EDIT = "edit";
+
+	private static final int ADD_IMAGE_INTENT = 100;
 
 	private Uri uri = null;
 	private boolean edit = false;
@@ -208,21 +215,65 @@ public class NoteActivity extends Activity implements GooglePlayServicesClient.C
 	}
 
 	@Override
-	public boolean onPrepareOptionsMenu(Menu menu) {
-		return !this.edit;
-	}
-
-	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case R.id.show_location:
-				String uri = String.format(Locale.ENGLISH, "geo:%f,%f", this.latitude, this.longitude);
-				Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
-				startActivity(intent);
+				showLocation();
+				return true;
+			case R.id.add_image:
+				addImage();
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);
 		}
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (requestCode == ADD_IMAGE_INTENT) {
+			if (resultCode == RESULT_OK) {
+				Toast.makeText(this, "Image added", Toast.LENGTH_SHORT).show();
+			}
+			else if (resultCode == RESULT_CANCELED) {
+				// Cancelled: ok, no more stuff to do
+			}
+			else {
+				Log.e(MainActivity.TAG, "Error in taking the picute");
+				Toast.makeText(this, "Error in taking the camera", Toast.LENGTH_LONG).show();
+			}
+		}
+	}
+
+	private void addImage() {
+		// Prepare environment to save the file
+		if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+			Log.w(MainActivity.TAG, "Unable to use external storage: " + Environment.getExternalStorageState());
+			Toast.makeText(this, "External storage not mounted: cannot take picture", Toast.LENGTH_LONG).show();
+		}
+		else {
+			File locationDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "DimaTodos");
+			if (!locationDir.exists()) {
+				if (!locationDir.mkdir()) {
+					Log.e(MainActivity.TAG, "Unable to create image directory");
+					Toast.makeText(this, "Unable to use external storage", Toast.LENGTH_LONG).show();
+					return;
+				}
+			}
+			String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+			File location = new File(locationDir.getPath() + File.separator + "IMG_" + timeStamp + ".jpg");
+			Log.i(MainActivity.TAG, "Picture will be saved at: " + location.toURI());
+
+			// Intent
+			Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+			intent.putExtra(MediaStore.EXTRA_OUTPUT, location.toURI());
+			startActivityForResult(intent, ADD_IMAGE_INTENT);
+		}
+	}
+
+	private void showLocation() {
+		String uri = String.format(Locale.ENGLISH, "geo:%f,%f", this.latitude, this.longitude);
+		Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+		startActivity(intent);
 	}
 
 	@Override
