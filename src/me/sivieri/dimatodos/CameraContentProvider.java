@@ -12,21 +12,21 @@ import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.text.TextUtils;
 
-public class NotesContentProvider extends DimaContentProvider {
+public class CameraContentProvider extends DimaContentProvider {
 
-	static final String AUTHORITY = "me.sivieri.dimatodos.notescontentprovider";
-	private static final String BASE_PATH = "notes";
-	private static final int NOTES = 10;
-	private static final int NOTE_ID = 20;
+	static final String AUTHORITY = "me.sivieri.dimatodos.cameracontentprovider";
+	private static final String BASE_PATH = "picture";
+	private static final int PICTURES = 10;
+	private static final int PICTURE_ID = 20;
 
 	public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/" + BASE_PATH);
-	public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE + "/notes";
-	public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/note";
+	public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE + "/pictures";
+	public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/picture";
 
 	private static final UriMatcher sURIMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 	static {
-		sURIMatcher.addURI(AUTHORITY, BASE_PATH, NOTES);
-		sURIMatcher.addURI(AUTHORITY, BASE_PATH + "/#", NOTE_ID);
+		sURIMatcher.addURI(AUTHORITY, BASE_PATH, PICTURES);
+		sURIMatcher.addURI(AUTHORITY, BASE_PATH + "/#", PICTURE_ID);
 	}
 
 	@Override
@@ -35,16 +35,16 @@ public class NotesContentProvider extends DimaContentProvider {
 		SQLiteDatabase sqlDB = this.database.getWritableDatabase();
 		int rowsDeleted = 0;
 		switch (uriType) {
-			case NOTES:
-				rowsDeleted = sqlDB.delete(NotesOpenHelper.TABLE_NAME, selection, selectionArgs);
+			case PICTURES:
+				rowsDeleted = sqlDB.delete(NotesOpenHelper.TABLE_IMG, selection, selectionArgs);
 				break;
-			case NOTE_ID:
+			case PICTURE_ID:
 				String id = uri.getLastPathSegment();
 				if (TextUtils.isEmpty(selection)) {
-					rowsDeleted = sqlDB.delete(NotesOpenHelper.TABLE_NAME, NotesOpenHelper.ID + "=" + id, null);
+					rowsDeleted = sqlDB.delete(NotesOpenHelper.TABLE_IMG, NotesOpenHelper.IMG_ID + "=" + id, null);
 				}
 				else {
-					rowsDeleted = sqlDB.delete(NotesOpenHelper.TABLE_NAME, NotesOpenHelper.ID + "=" + id + " and " + selection, selectionArgs);
+					rowsDeleted = sqlDB.delete(NotesOpenHelper.TABLE_IMG, NotesOpenHelper.IMG_ID + "=" + id + " and " + selection, selectionArgs);
 				}
 				break;
 			default:
@@ -66,8 +66,8 @@ public class NotesContentProvider extends DimaContentProvider {
 		SQLiteDatabase sqlDB = this.database.getWritableDatabase();
 		long id = 0;
 		switch (uriType) {
-			case NOTES:
-				id = sqlDB.insert(NotesOpenHelper.TABLE_NAME, null, values);
+			case PICTURES:
+				id = sqlDB.insert(NotesOpenHelper.TABLE_IMG, null, values);
 				break;
 			default:
 				throw new IllegalArgumentException("Unknown URI: " + uri);
@@ -80,14 +80,14 @@ public class NotesContentProvider extends DimaContentProvider {
 	public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
 		SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
 		checkColumns(projection);
-		queryBuilder.setTables(NotesOpenHelper.TABLE_NAME);
+		queryBuilder.setTables(NotesOpenHelper.TABLE_IMG);
 
 		int uriType = sURIMatcher.match(uri);
 		switch (uriType) {
-			case NOTES:
+			case PICTURES:
 				break;
-			case NOTE_ID:
-				queryBuilder.appendWhere(NotesOpenHelper.ID + "=" + uri.getLastPathSegment());
+			case PICTURE_ID:
+				queryBuilder.appendWhere(NotesOpenHelper.IMG_ID + "=" + uri.getLastPathSegment());
 				break;
 			default:
 				throw new IllegalArgumentException("Unknown URI: " + uri);
@@ -106,16 +106,16 @@ public class NotesContentProvider extends DimaContentProvider {
 		SQLiteDatabase sqlDB = this.database.getWritableDatabase();
 		int rowsUpdated = 0;
 		switch (uriType) {
-			case NOTES:
-				rowsUpdated = sqlDB.update(NotesOpenHelper.TABLE_NAME, values, selection, selectionArgs);
+			case PICTURES:
+				rowsUpdated = sqlDB.update(NotesOpenHelper.TABLE_IMG, values, selection, selectionArgs);
 				break;
-			case NOTE_ID:
+			case PICTURE_ID:
 				String id = uri.getLastPathSegment();
 				if (TextUtils.isEmpty(selection)) {
-					rowsUpdated = sqlDB.update(NotesOpenHelper.TABLE_NAME, values, NotesOpenHelper.ID + "=" + id, null);
+					rowsUpdated = sqlDB.update(NotesOpenHelper.TABLE_IMG, values, NotesOpenHelper.IMG_ID + "=" + id, null);
 				}
 				else {
-					rowsUpdated = sqlDB.update(NotesOpenHelper.TABLE_NAME, values, NotesOpenHelper.ID + "=" + id + " and " + selection, selectionArgs);
+					rowsUpdated = sqlDB.update(NotesOpenHelper.TABLE_IMG, values, NotesOpenHelper.IMG_ID + "=" + id + " and " + selection, selectionArgs);
 				}
 				break;
 			default:
@@ -127,7 +127,7 @@ public class NotesContentProvider extends DimaContentProvider {
 	}
 
 	private void checkColumns(String[] projection) {
-		String[] available = { NotesOpenHelper.ID, NotesOpenHelper.KEY, NotesOpenHelper.VALUE, NotesOpenHelper.TIMESTAMP, NotesOpenHelper.LAT, NotesOpenHelper.LNG };
+		String[] available = { NotesOpenHelper.IMG_ID, NotesOpenHelper.IMG_NAME, NotesOpenHelper.IMG_NOTE_ID };
 		if (projection != null) {
 			HashSet<String> requestedColumns = new HashSet<String>(Arrays.asList(projection));
 			HashSet<String> availableColumns = new HashSet<String>(Arrays.asList(available));

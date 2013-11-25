@@ -2,7 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="me.sivieri.dimatodos"
     android:versionCode="3"
-    android:versionName="1.2" >
+    android:versionName="1.2"
+    android:installLocation="auto" >
 
     <uses-sdk
         android:minSdkVersion="10"
@@ -25,7 +26,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <provider android:authorities="me.sivieri.dimatodos" android:name="NotesContentProvider"
+        <provider android:authorities="me.sivieri.dimatodos.notescontentprovider" android:name="NotesContentProvider"
+            android:exported="false"></provider>
+        <provider android:authorities="me.sivieri.dimatodos.cameracontentprovider" android:name="CameraContentProvider"
             android:exported="false"></provider>
         <activity android:name="NoteActivity" android:label="@string/note_activity"></activity>
         <meta-data android:name="com.google.android.gms.version"

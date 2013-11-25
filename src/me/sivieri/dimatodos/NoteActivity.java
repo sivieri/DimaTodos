@@ -255,6 +255,13 @@ public class NoteActivity extends Activity implements GooglePlayServicesClient.C
 						Toast.makeText(this, "Image not saved where we want it - sorry", Toast.LENGTH_LONG).show();
 					}
 				}
+				ContentValues values = new ContentValues();
+				values.put(NotesOpenHelper.IMG_NAME, this.location.toString());
+				values.put(NotesOpenHelper.IMG_NOTE_ID, this.uri.getLastPathSegment());
+				Log.d(MainActivity.TAG, this.uri.getLastPathSegment());
+				Uri partial = getContentResolver().insert(CameraContentProvider.CONTENT_URI, values);
+				this.uri = Uri.parse("content://" + CameraContentProvider.AUTHORITY + "/" + partial);
+				Log.d(MainActivity.TAG, this.uri.toString());
 				Toast.makeText(this, "Image added", Toast.LENGTH_SHORT).show();
 			}
 			else if (resultCode == RESULT_CANCELED) {

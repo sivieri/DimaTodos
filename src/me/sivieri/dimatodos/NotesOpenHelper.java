@@ -8,15 +8,23 @@ import android.util.Log;
 public class NotesOpenHelper extends SQLiteOpenHelper {
 
 	static final String TABLE_NAME = "dimanotes";
-	static final int TABLE_VERSION = 4;
+	static final int TABLE_VERSION = 6;
 	static final String ID = "_id";
 	static final String KEY = "title";
 	static final String VALUE = "content";
 	static final String TIMESTAMP = "ts";
 	static final String LAT = "lat";
 	static final String LNG = "lng";
+
+	static final String TABLE_IMG = "dimacamera";
+	static final String IMG_ID = "_id";
+	static final String IMG_NAME = "filename";
+	static final String IMG_NOTE_ID = "noteid";
+
 	private static final String TABLE_CREATE = "CREATE TABLE " + TABLE_NAME + " (" + ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + KEY + " TEXT, " + VALUE + " TEXT," + TIMESTAMP
 	        + " DATETIME DEFAULT CURRENT_TIMESTAMP, " + LAT + " double DEFAULT 0, " + LNG + " double DEFAULT 0);";
+	private static final String IMG_TABLE_CREATE = "CREATE TABLE " + TABLE_IMG + " (" + IMG_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + IMG_NAME + " TEXT, " + IMG_NOTE_ID
+	        + " INTEGER, FOREIGN KEY (" + IMG_NOTE_ID + ")  REFERENCES " + TABLE_NAME + " (" + ID + "));";
 	private static final String WELCOME_MSG = "INSERT INTO " + TABLE_NAME + "(" + KEY + ", " + VALUE
 	        + ") VALUES ('Welcome', 'Welcome to the todo/notes app for Design and Implementation of Mobile Applications (DIMA) course!')";
 	private static final String UPGRADE_3_TO_4_P1 = "ALTER TABLE " + TABLE_NAME + " ADD COLUMN " + LAT + " double DEFAULT 0;";
@@ -30,6 +38,7 @@ public class NotesOpenHelper extends SQLiteOpenHelper {
 	public void onCreate(SQLiteDatabase arg0) {
 		Log.i(MainActivity.TAG, "Creating the db");
 		arg0.execSQL(TABLE_CREATE);
+		arg0.execSQL(IMG_TABLE_CREATE);
 		arg0.execSQL(WELCOME_MSG);
 	}
 
@@ -39,6 +48,13 @@ public class NotesOpenHelper extends SQLiteOpenHelper {
 		if (arg1 == 3 && arg2 == 4) {
 			arg0.execSQL(UPGRADE_3_TO_4_P1);
 			arg0.execSQL(UPGRADE_3_TO_4_P2);
+		}
+		else if (arg1 == 4 && (arg2 == 5 || arg2 == 6)) {
+			arg0.execSQL(IMG_TABLE_CREATE);
+		}
+		else if (arg1 == 5 && arg2 == 6) {
+			arg0.execSQL("DROP TABLE IF EXISTS " + TABLE_IMG);
+			arg0.execSQL(IMG_TABLE_CREATE);
 		}
 		else {
 			arg0.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
