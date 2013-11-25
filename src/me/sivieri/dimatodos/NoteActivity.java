@@ -248,6 +248,8 @@ public class NoteActivity extends Activity implements GooglePlayServicesClient.C
 						InputStream input = getContentResolver().openInputStream(data.getData());
 						FileOutputStream output = new FileOutputStream(new File(this.location));
 						ByteStreams.copy(input, output);
+						input.close();
+						output.close();
 					}
 					catch (Exception e) {
 						Toast.makeText(this, "Image not saved where we want it - sorry", Toast.LENGTH_LONG).show();
