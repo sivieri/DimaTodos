@@ -108,7 +108,7 @@ public class MainActivity extends FragmentActivity implements LoaderCallbacks<Cu
 	@Override
 	public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
 		String[] projection = { NotesOpenHelper.ID, NotesOpenHelper.KEY };
-		return new CursorLoader(this, NotesContentProvider.CONTENT_URI, projection, null, null, null);
+		return new CursorLoader(this, NotesContentProvider.CONTENT_URI, projection, null, null, NotesOpenHelper.ID + " DESC");
 	}
 
 	@Override

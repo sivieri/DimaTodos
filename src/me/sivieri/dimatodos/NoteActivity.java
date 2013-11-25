@@ -1,6 +1,9 @@
 package me.sivieri.dimatodos;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -31,6 +34,7 @@ import android.widget.ViewSwitcher;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.location.LocationClient;
+import com.google.common.io.ByteStreams;
 
 public class NoteActivity extends Activity implements GooglePlayServicesClient.ConnectionCallbacks, GooglePlayServicesClient.OnConnectionFailedListener {
 
@@ -45,6 +49,7 @@ public class NoteActivity extends Activity implements GooglePlayServicesClient.C
 	private LocationClient locationClient = null;
 	private double latitude = 0;
 	private double longitude = 0;
+	private URI location = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -232,6 +237,22 @@ public class NoteActivity extends Activity implements GooglePlayServicesClient.C
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == ADD_IMAGE_INTENT) {
 			if (resultCode == RESULT_OK) {
+				if (data != null && data.getData() != null) {
+					/*
+					 * If so, then the image is NOT where it is supposed to be:
+					 * it looks like those phones that respect the ExtraOutput
+					 * field give us NULL, while the others don't... So we copy
+					 * the file where we want it
+					 */
+					try {
+						InputStream input = getContentResolver().openInputStream(data.getData());
+						FileOutputStream output = new FileOutputStream(new File(this.location));
+						ByteStreams.copy(input, output);
+					}
+					catch (Exception e) {
+						Toast.makeText(this, "Image not saved where we want it - sorry", Toast.LENGTH_LONG).show();
+					}
+				}
 				Toast.makeText(this, "Image added", Toast.LENGTH_SHORT).show();
 			}
 			else if (resultCode == RESULT_CANCELED) {
@@ -254,18 +275,25 @@ public class NoteActivity extends Activity implements GooglePlayServicesClient.C
 			File locationDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "DimaTodos");
 			if (!locationDir.exists()) {
 				if (!locationDir.mkdir()) {
-					Log.e(MainActivity.TAG, "Unable to create image directory");
-					Toast.makeText(this, "Unable to use external storage", Toast.LENGTH_LONG).show();
-					return;
+					// crap: fallback...
+					Log.w(MainActivity.TAG, "Unable to create image directory " + locationDir.toURI());
+					locationDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM), "DimaTodos");
+					if (!locationDir.exists()) {
+						if (!locationDir.mkdir()) {
+							Log.e(MainActivity.TAG, "Unable to create secondary image directory " + locationDir.toURI());
+							Toast.makeText(this, "Unable to write in picture directory", Toast.LENGTH_LONG).show();
+							return;
+						}
+					}
 				}
 			}
 			String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-			File location = new File(locationDir.getPath() + File.separator + "IMG_" + timeStamp + ".jpg");
-			Log.i(MainActivity.TAG, "Picture will be saved at: " + location.toURI());
+			this.location = new File(locationDir.getPath() + File.separator + "IMG_" + timeStamp + ".jpg").toURI();
+			Log.i(MainActivity.TAG, "Picture will be saved at: " + this.location);
 
 			// Intent
 			Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-			intent.putExtra(MediaStore.EXTRA_OUTPUT, location.toURI());
+			intent.putExtra(MediaStore.EXTRA_OUTPUT, this.location);
 			startActivityForResult(intent, ADD_IMAGE_INTENT);
 		}
 	}
