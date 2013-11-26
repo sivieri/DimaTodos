@@ -127,7 +127,7 @@ public class NotesContentProvider extends DimaContentProvider {
 	}
 
 	private void checkColumns(String[] projection) {
-		String[] available = { NotesOpenHelper.ID, NotesOpenHelper.KEY, NotesOpenHelper.VALUE, NotesOpenHelper.TIMESTAMP, NotesOpenHelper.LAT, NotesOpenHelper.LNG };
+		String[] available = { NotesOpenHelper.ID, NotesOpenHelper.KEY, NotesOpenHelper.VALUE, NotesOpenHelper.TIMESTAMP, NotesOpenHelper.LAT, NotesOpenHelper.LNG, NotesOpenHelper.LOCATION };
 		if (projection != null) {
 			HashSet<String> requestedColumns = new HashSet<String>(Arrays.asList(projection));
 			HashSet<String> availableColumns = new HashSet<String>(Arrays.asList(available));

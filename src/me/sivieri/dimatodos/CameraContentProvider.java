@@ -127,7 +127,7 @@ public class CameraContentProvider extends DimaContentProvider {
 	}
 
 	private void checkColumns(String[] projection) {
-		String[] available = { NotesOpenHelper.IMG_ID, NotesOpenHelper.IMG_NAME, NotesOpenHelper.IMG_NOTE_ID };
+		String[] available = { NotesOpenHelper.IMG_ID, NotesOpenHelper.IMG_NAME, NotesOpenHelper.IMG_NOTE_ID, NotesOpenHelper.IMG_TITLE };
 		if (projection != null) {
 			HashSet<String> requestedColumns = new HashSet<String>(Arrays.asList(projection));
 			HashSet<String> availableColumns = new HashSet<String>(Arrays.asList(available));

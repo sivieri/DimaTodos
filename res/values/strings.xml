@@ -21,5 +21,6 @@
     <string name="show_location">Show creation location</string>
     <string name="add_image">Add image...</string>
     <string name="show_attachments">Show attachments</string>
+    <string name="note_location_hint">Where are you?</string>
 
 </resources>

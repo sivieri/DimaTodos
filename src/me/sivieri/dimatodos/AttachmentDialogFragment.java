@@ -30,7 +30,7 @@ public class AttachmentDialogFragment extends DialogFragment {
 		String id = getArguments().getString(NOTEID);
 		AlertDialog.Builder builder;
 		builder = new AlertDialog.Builder(getActivity());
-		String[] projection = { NotesOpenHelper.IMG_ID, NotesOpenHelper.IMG_NAME, NotesOpenHelper.IMG_NOTE_ID };
+		String[] projection = { NotesOpenHelper.IMG_ID, NotesOpenHelper.IMG_NAME, NotesOpenHelper.IMG_TITLE };
 		String selection = NotesOpenHelper.IMG_NOTE_ID + " = ?";
 		String[] selectionArgs = { id };
 		final Cursor c = getActivity().getContentResolver().query(CameraContentProvider.CONTENT_URI, projection, selection, selectionArgs, null);
@@ -50,7 +50,7 @@ public class AttachmentDialogFragment extends DialogFragment {
 				startActivity(intent);
 			}
 
-		}, NotesOpenHelper.IMG_NAME);
+		}, NotesOpenHelper.IMG_TITLE);
 		return builder.create();
 	}
 }
