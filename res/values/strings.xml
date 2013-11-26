@@ -22,5 +22,8 @@
     <string name="add_image">Add image...</string>
     <string name="show_attachments">Show attachments</string>
     <string name="note_location_hint">Where are you?</string>
+    <string name="picture__dialog_default">picture</string>
+    <string name="picture_dialog_title">New picture</string>
+    <string name="picture_dialog_message">Set picture title:</string>
 
 </resources>

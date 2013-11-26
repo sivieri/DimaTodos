@@ -59,19 +59,16 @@ public class NoteActivity extends FragmentActivity implements GooglePlayServices
 		setContentView(R.layout.editor);
 		TextView titleText = (TextView) findViewById(R.id.titleText);
 		TextView contentText = (TextView) findViewById(R.id.contentText);
+		TextView locationText = (TextView) findViewById(R.id.locationText);
 		EditText titleTextEdit = (EditText) findViewById(R.id.titleTextEdit);
 		EditText contentTextEdit = (EditText) findViewById(R.id.contentTextEdit);
+		EditText locationTextEdit = (EditText) findViewById(R.id.locationTextEdit);
 		final ViewSwitcher titleView = (ViewSwitcher) findViewById(R.id.titleView);
 		final ViewSwitcher contentView = (ViewSwitcher) findViewById(R.id.contentView);
-		titleText.setScroller(new Scroller(this));
-		titleText.setVerticalScrollBarEnabled(true);
-		titleText.setMovementMethod(new ScrollingMovementMethod());
+		final ViewSwitcher locationView = (ViewSwitcher) findViewById(R.id.locationView);
 		contentText.setScroller(new Scroller(this));
 		contentText.setVerticalScrollBarEnabled(true);
 		contentText.setMovementMethod(new ScrollingMovementMethod());
-		titleTextEdit.setScroller(new Scroller(this));
-		titleTextEdit.setVerticalScrollBarEnabled(true);
-		titleTextEdit.setMovementMethod(new ScrollingMovementMethod());
 		contentTextEdit.setScroller(new Scroller(this));
 		contentTextEdit.setVerticalScrollBarEnabled(true);
 		contentTextEdit.setMovementMethod(new ScrollingMovementMethod());
@@ -81,24 +78,28 @@ public class NoteActivity extends FragmentActivity implements GooglePlayServices
 			this.edit = extras.getBoolean(EDIT);
 			this.getLocation = extras.getBoolean(LOCATION);
 			if (this.uri != null) {
-				String[] projection = { NotesOpenHelper.KEY, NotesOpenHelper.VALUE, NotesOpenHelper.LAT, NotesOpenHelper.LNG };
+				String[] projection = { NotesOpenHelper.KEY, NotesOpenHelper.VALUE, NotesOpenHelper.LAT, NotesOpenHelper.LNG, NotesOpenHelper.LOCATION };
 				Cursor cursor = getContentResolver().query(this.uri, projection, null, null, null);
 				if (cursor != null) {
 					cursor.moveToFirst();
 					String title = cursor.getString(cursor.getColumnIndexOrThrow(NotesOpenHelper.KEY));
 					String content = cursor.getString(cursor.getColumnIndexOrThrow(NotesOpenHelper.VALUE));
+					String location = cursor.getString(cursor.getColumnIndexOrThrow(NotesOpenHelper.LOCATION));
 					this.latitude = cursor.getDouble(cursor.getColumnIndexOrThrow(NotesOpenHelper.LAT));
 					this.longitude = cursor.getDouble(cursor.getColumnIndexOrThrow(NotesOpenHelper.LNG));
 					titleText.setText(title);
 					contentText.setText(content);
+					locationText.setText(location);
 					titleTextEdit.setText(title);
 					contentTextEdit.setText(content);
+					locationTextEdit.setText(location);
 					cursor.close();
 				}
 			}
 			if (this.edit) {
 				titleView.showNext();
 				contentView.showNext();
+				locationView.showNext();
 			}
 		}
 		ImageButton button = (ImageButton) findViewById(R.id.editButton);
@@ -109,6 +110,7 @@ public class NoteActivity extends FragmentActivity implements GooglePlayServices
 				NoteActivity.this.edit = true;
 				titleView.showNext();
 				contentView.showNext();
+				locationView.showNext();
 			}
 
 		});
@@ -138,9 +140,11 @@ public class NoteActivity extends FragmentActivity implements GooglePlayServices
 		else {
 			EditText titleTextEdit = (EditText) findViewById(R.id.titleTextEdit);
 			EditText contentTextEdit = (EditText) findViewById(R.id.contentTextEdit);
+			EditText locationTextEdit = (EditText) findViewById(R.id.locationTextEdit);
 			String title = titleTextEdit.getText().toString();
 			String content = contentTextEdit.getText().toString();
-			if (title.length() == 0 && content.length() == 0) {
+			String location = locationTextEdit.getText().toString();
+			if (title.length() == 0 && content.length() == 0 && location.length() == 0) {
 				if (this.uri == null) {
 					Toast.makeText(getApplicationContext(), getString(R.string.note_discarded), Toast.LENGTH_SHORT).show();
 					super.finish();
@@ -164,8 +168,10 @@ public class NoteActivity extends FragmentActivity implements GooglePlayServices
 						public void onClick(DialogInterface arg0, int arg1) {
 							ViewSwitcher titleView = (ViewSwitcher) findViewById(R.id.titleView);
 							ViewSwitcher contentView = (ViewSwitcher) findViewById(R.id.contentView);
+							ViewSwitcher locationView = (ViewSwitcher) findViewById(R.id.locationView);
 							titleView.showPrevious();
 							contentView.showPrevious();
+							locationView.showPrevious();
 							NoteActivity.this.edit = false;
 						}
 
@@ -182,6 +188,9 @@ public class NoteActivity extends FragmentActivity implements GooglePlayServices
 				values.put(NotesOpenHelper.VALUE, content);
 				values.put(NotesOpenHelper.LAT, this.latitude);
 				values.put(NotesOpenHelper.LNG, this.longitude);
+				if (location.length() != 0) {
+					values.put(NotesOpenHelper.LOCATION, location);
+				}
 				if (this.uri == null) {
 					Uri partial = getContentResolver().insert(NotesContentProvider.CONTENT_URI, values);
 					this.uri = Uri.parse("content://" + NotesContentProvider.AUTHORITY + "/" + partial);
@@ -192,12 +201,16 @@ public class NoteActivity extends FragmentActivity implements GooglePlayServices
 				}
 				TextView titleText = (TextView) findViewById(R.id.titleText);
 				TextView contentText = (TextView) findViewById(R.id.contentText);
+				TextView locationText = (TextView) findViewById(R.id.locationText);
 				titleText.setText(title);
 				contentText.setText(content);
+				locationText.setText(location);
 				ViewSwitcher titleView = (ViewSwitcher) findViewById(R.id.titleView);
 				ViewSwitcher contentView = (ViewSwitcher) findViewById(R.id.contentView);
+				ViewSwitcher locationView = (ViewSwitcher) findViewById(R.id.locationView);
 				titleView.showPrevious();
 				contentView.showPrevious();
+				locationView.showPrevious();
 				this.edit = false;
 				Toast.makeText(getApplicationContext(), getString(R.string.note_saved), Toast.LENGTH_SHORT).show();
 			}
@@ -261,17 +274,40 @@ public class NoteActivity extends FragmentActivity implements GooglePlayServices
 						output.close();
 					}
 					catch (Exception e) {
-						Toast.makeText(this, "Image not saved where we want it - sorry", Toast.LENGTH_LONG).show();
+						Toast.makeText(this, "Image not saved where we wanted it - sorry", Toast.LENGTH_LONG).show();
 					}
 				}
-				ContentValues values = new ContentValues();
-				values.put(NotesOpenHelper.IMG_NAME, this.location.toString());
-				values.put(NotesOpenHelper.IMG_NOTE_ID, this.uri.getLastPathSegment());
-				Log.d(MainActivity.TAG, this.uri.getLastPathSegment());
-				Uri partial = getContentResolver().insert(CameraContentProvider.CONTENT_URI, values);
-				this.uri = Uri.parse("content://" + CameraContentProvider.AUTHORITY + "/" + partial);
-				Log.d(MainActivity.TAG, this.uri.toString());
-				Toast.makeText(this, "Image added", Toast.LENGTH_SHORT).show();
+				AlertDialog.Builder builder = new AlertDialog.Builder(this);
+				builder.setTitle(getString(R.string.picture_dialog_title));
+				builder.setMessage(getString(R.string.picture_dialog_message));
+				final EditText titleText = new EditText(this);
+				titleText.setText(getString(R.string.picture__dialog_default));
+				builder.setView(titleText);
+				builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						String title = titleText.getText().toString();
+						ContentValues values = new ContentValues();
+						values.put(NotesOpenHelper.IMG_NAME, NoteActivity.this.location.toString());
+						values.put(NotesOpenHelper.IMG_NOTE_ID, NoteActivity.this.uri.getLastPathSegment());
+						values.put(NotesOpenHelper.IMG_TITLE, title);
+						Log.d(MainActivity.TAG, NoteActivity.this.uri.getLastPathSegment());
+						Uri partial = getContentResolver().insert(CameraContentProvider.CONTENT_URI, values);
+						NoteActivity.this.uri = Uri.parse("content://" + CameraContentProvider.AUTHORITY + "/" + partial);
+						Log.d(MainActivity.TAG, NoteActivity.this.uri.toString());
+						Toast.makeText(NoteActivity.this, "Image added", Toast.LENGTH_SHORT).show();
+					}
+				});
+				builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						File file = new File(NoteActivity.this.location);
+						file.delete();
+					}
+				});
+				builder.show();
 			}
 			else if (resultCode == RESULT_CANCELED) {
 				// Cancelled: ok, no more stuff to do

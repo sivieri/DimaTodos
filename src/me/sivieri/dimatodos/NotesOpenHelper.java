@@ -25,8 +25,8 @@ public class NotesOpenHelper extends SQLiteOpenHelper {
 
 	private static final String TABLE_CREATE = "CREATE TABLE " + TABLE_NAME + " (" + ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + KEY + " TEXT, " + VALUE + " TEXT," + TIMESTAMP
 	        + " DATETIME DEFAULT CURRENT_TIMESTAMP, " + LAT + " double DEFAULT 0, " + LNG + " double DEFAULT 0, " + LOCATION + " TEXT);";
-	private static final String IMG_TABLE_CREATE = "CREATE TABLE " + TABLE_IMG + " (" + IMG_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + IMG_NAME + " TEXT, " + IMG_NOTE_ID
-	        + " INTEGER, FOREIGN KEY (" + IMG_NOTE_ID + ")  REFERENCES " + TABLE_NAME + " (" + ID + "), " + IMG_TITLE + " TEXT);";
+	private static final String IMG_TABLE_CREATE = "CREATE TABLE " + TABLE_IMG + " (" + IMG_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + IMG_NAME + " TEXT, " + IMG_NOTE_ID + " INTEGER, " + IMG_TITLE
+	        + " TEXT, FOREIGN KEY (" + IMG_NOTE_ID + ")  REFERENCES " + TABLE_NAME + " (" + ID + "));";
 	private static final String WELCOME_MSG = "INSERT INTO " + TABLE_NAME + "(" + KEY + ", " + VALUE
 	        + ") VALUES ('Welcome', 'Welcome to the todo/notes app for Design and Implementation of Mobile Applications (DIMA) course!')";
 	private static final String UPGRADE_3_TO_4_P1 = "ALTER TABLE " + TABLE_NAME + " ADD COLUMN " + LAT + " double DEFAULT 0;";
