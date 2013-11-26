@@ -5,8 +5,10 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.URI;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import android.app.AlertDialog;
 import android.content.ContentValues;
@@ -37,7 +39,7 @@ import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.location.LocationClient;
 import com.google.common.io.ByteStreams;
 
-public class NoteActivity extends FragmentActivity implements GooglePlayServicesClient.ConnectionCallbacks, GooglePlayServicesClient.OnConnectionFailedListener {
+public class NoteActivity extends FragmentActivity implements CurrentEventLocationResult, GooglePlayServicesClient.ConnectionCallbacks, GooglePlayServicesClient.OnConnectionFailedListener {
 
 	public static final String LOCATION = "location";
 	public static final String EDIT = "edit";
@@ -100,6 +102,13 @@ public class NoteActivity extends FragmentActivity implements GooglePlayServices
 				titleView.showNext();
 				contentView.showNext();
 				locationView.showNext();
+				if (this.uri == null) {
+					Calendar utc = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+					long current = utc.getTimeInMillis();
+					CurrentEventLocationTask task = new CurrentEventLocationTask();
+					task.setDelegate(this);
+					task.execute(current);
+				}
 			}
 		}
 		ImageButton button = (ImageButton) findViewById(R.id.editButton);
@@ -375,6 +384,12 @@ public class NoteActivity extends FragmentActivity implements GooglePlayServices
 	@Override
 	public void onDisconnected() {
 		Log.i(MainActivity.TAG, "Location disconnected");
+	}
+
+	@Override
+	public void processResult(String result) {
+		EditText locationTextEdit = (EditText) findViewById(R.id.locationTextEdit);
+		locationTextEdit.setText(result);
 	}
 
 }
