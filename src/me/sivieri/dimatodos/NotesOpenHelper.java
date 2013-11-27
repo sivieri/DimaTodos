@@ -64,6 +64,10 @@ public class NotesOpenHelper extends SQLiteOpenHelper {
 			arg0.execSQL(UPGRADE_6_TO_7_P1);
 			arg0.execSQL(UPGRADE_6_TO_7_P2);
 		}
+		else if (arg1 == 4 && arg2 == 7) {
+			arg0.execSQL(UPGRADE_6_TO_7_P1);
+			arg0.execSQL(IMG_TABLE_CREATE);
+		}
 		else {
 			arg0.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
 			onCreate(arg0);

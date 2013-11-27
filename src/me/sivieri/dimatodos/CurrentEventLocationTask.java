@@ -23,6 +23,7 @@ public class CurrentEventLocationTask extends AsyncTask<Long, Void, String> {
 		String[] selectionArgs = { current, current };
 		Cursor cursor = this.contentResolver.query(Events.CONTENT_URI, projection, selection, selectionArgs, null);
 		if (cursor != null && cursor.getCount() > 0) {
+			cursor.moveToFirst();
 			result = cursor.getString(cursor.getColumnIndexOrThrow(Events.EVENT_LOCATION));
 			Log.i(MainActivity.TAG, "Found a location: " + result);
 		}
