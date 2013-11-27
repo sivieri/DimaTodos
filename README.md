@@ -22,3 +22,5 @@ Android app tutorial for DIMA 2013 @ PoliMi
 * External content providers: calendar
 * Use functionality for specific API versions
 * Asynchronous tasks
+
+Please, notice that to use this version (and the next ones) you need the Google Play Services library, which is obtained as explained in the [official tutorial](http://developer.android.com/google/play-services/setup.html); once you have the project in your Eclipse workspace, you need to add a reference to it (the current version of the project may have the reference from my workspace), as explained in [this other tutorial](http://developer.android.com/tools/projects/projects-eclipse.html#ReferencingLibraryProject).
