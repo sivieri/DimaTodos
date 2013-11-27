@@ -15,3 +15,10 @@ Android app tutorial for DIMA 2013 @ PoliMi
 * DimaTodos note editor
 * GPS and Location API (Google Play Services)
 * External intents through URIs
+
+# Lesson 3
+* External intents: camera (send and receive data)
+* DimaTodos note editor (reprise)
+* External content providers: calendar
+* Use functionality for specific API versions
+* Asynchronous tasks
