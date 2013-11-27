@@ -17,6 +17,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.location.Location;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -102,11 +103,13 @@ public class NoteActivity extends FragmentActivity implements CurrentEventLocati
 				titleView.showNext();
 				contentView.showNext();
 				locationView.showNext();
-				if (this.uri == null) {
+				if (this.uri == null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+					Log.i(MainActivity.TAG, "Launching the calendar task...");
 					Calendar utc = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
 					long current = utc.getTimeInMillis();
 					CurrentEventLocationTask task = new CurrentEventLocationTask();
 					task.setDelegate(this);
+					task.setContentResolver(getContentResolver());
 					task.execute(current);
 				}
 			}
