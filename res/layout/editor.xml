@@ -105,6 +105,8 @@
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:layout_marginTop="5dp"
+            android:scrollbars="vertical"
+            android:maxLines="100"
             android:ems="10"
             android:gravity="top"
             android:hint="@string/note_content_hint" />
@@ -118,6 +120,8 @@
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:layout_marginTop="5dp"
+            android:scrollbars="vertical"
+            android:maxLines="100"
             android:ems="10"
             android:gravity="top"
             android:hint="@string/note_content_hint" />

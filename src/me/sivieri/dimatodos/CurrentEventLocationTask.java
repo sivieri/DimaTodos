@@ -26,6 +26,7 @@ public class CurrentEventLocationTask extends AsyncTask<Long, Void, String> {
 			cursor.moveToFirst();
 			result = cursor.getString(cursor.getColumnIndexOrThrow(Events.EVENT_LOCATION));
 			Log.i(MainActivity.TAG, "Found a location: " + result);
+			cursor.close();
 		}
 
 		return result;

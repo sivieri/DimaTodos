@@ -30,7 +30,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.Scroller;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
@@ -66,14 +65,7 @@ public class NoteActivity extends FragmentActivity implements CurrentEventLocati
 		EditText titleTextEdit = (EditText) findViewById(R.id.titleTextEdit);
 		EditText contentTextEdit = (EditText) findViewById(R.id.contentTextEdit);
 		EditText locationTextEdit = (EditText) findViewById(R.id.locationTextEdit);
-		final ViewSwitcher titleView = (ViewSwitcher) findViewById(R.id.titleView);
-		final ViewSwitcher contentView = (ViewSwitcher) findViewById(R.id.contentView);
-		final ViewSwitcher locationView = (ViewSwitcher) findViewById(R.id.locationView);
-		contentText.setScroller(new Scroller(this));
-		contentText.setVerticalScrollBarEnabled(true);
 		contentText.setMovementMethod(new ScrollingMovementMethod());
-		contentTextEdit.setScroller(new Scroller(this));
-		contentTextEdit.setVerticalScrollBarEnabled(true);
 		contentTextEdit.setMovementMethod(new ScrollingMovementMethod());
 		Bundle extras = getIntent().getExtras();
 		if (extras != null) {
@@ -100,9 +92,7 @@ public class NoteActivity extends FragmentActivity implements CurrentEventLocati
 				}
 			}
 			if (this.edit) {
-				titleView.showNext();
-				contentView.showNext();
-				locationView.showNext();
+				moveToEdit();
 				if (this.uri == null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
 					Log.i(MainActivity.TAG, "Launching the calendar task...");
 					Calendar utc = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
@@ -120,9 +110,7 @@ public class NoteActivity extends FragmentActivity implements CurrentEventLocati
 			@Override
 			public void onClick(View v) {
 				NoteActivity.this.edit = true;
-				titleView.showNext();
-				contentView.showNext();
-				locationView.showNext();
+				moveToEdit();
 			}
 
 		});
@@ -156,7 +144,7 @@ public class NoteActivity extends FragmentActivity implements CurrentEventLocati
 			String title = titleTextEdit.getText().toString();
 			String content = contentTextEdit.getText().toString();
 			String location = locationTextEdit.getText().toString();
-			if (title.length() == 0 && content.length() == 0 && location.length() == 0) {
+			if (title.length() == 0 && content.length() == 0) {
 				if (this.uri == null) {
 					Toast.makeText(getApplicationContext(), getString(R.string.note_discarded), Toast.LENGTH_SHORT).show();
 					super.finish();
@@ -178,12 +166,7 @@ public class NoteActivity extends FragmentActivity implements CurrentEventLocati
 
 						@Override
 						public void onClick(DialogInterface arg0, int arg1) {
-							ViewSwitcher titleView = (ViewSwitcher) findViewById(R.id.titleView);
-							ViewSwitcher contentView = (ViewSwitcher) findViewById(R.id.contentView);
-							ViewSwitcher locationView = (ViewSwitcher) findViewById(R.id.locationView);
-							titleView.showPrevious();
-							contentView.showPrevious();
-							locationView.showPrevious();
+							moveToView();
 							NoteActivity.this.edit = false;
 						}
 
@@ -217,16 +200,31 @@ public class NoteActivity extends FragmentActivity implements CurrentEventLocati
 				titleText.setText(title);
 				contentText.setText(content);
 				locationText.setText(location);
-				ViewSwitcher titleView = (ViewSwitcher) findViewById(R.id.titleView);
-				ViewSwitcher contentView = (ViewSwitcher) findViewById(R.id.contentView);
-				ViewSwitcher locationView = (ViewSwitcher) findViewById(R.id.locationView);
-				titleView.showPrevious();
-				contentView.showPrevious();
-				locationView.showPrevious();
+				moveToView();
 				this.edit = false;
 				Toast.makeText(getApplicationContext(), getString(R.string.note_saved), Toast.LENGTH_SHORT).show();
 			}
 		}
+	}
+
+	private void moveToEdit() {
+		ViewSwitcher titleView = (ViewSwitcher) findViewById(R.id.titleView);
+		ViewSwitcher contentView = (ViewSwitcher) findViewById(R.id.contentView);
+		ViewSwitcher locationView = (ViewSwitcher) findViewById(R.id.locationView);
+		titleView.showNext();
+		contentView.showNext();
+		locationView.showNext();
+		setTitle(getString(R.string.note_activity_edit));
+	}
+
+	private void moveToView() {
+		ViewSwitcher titleView = (ViewSwitcher) findViewById(R.id.titleView);
+		ViewSwitcher contentView = (ViewSwitcher) findViewById(R.id.contentView);
+		ViewSwitcher locationView = (ViewSwitcher) findViewById(R.id.locationView);
+		titleView.showPrevious();
+		contentView.showPrevious();
+		locationView.showPrevious();
+		setTitle(getString(R.string.note_activity_view));
 	}
 
 	private String substring(String string, int length) {

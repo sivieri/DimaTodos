@@ -31,7 +31,7 @@
             android:exported="false"></provider>
         <provider android:authorities="me.sivieri.dimatodos.cameracontentprovider" android:name="CameraContentProvider"
             android:exported="false"></provider>
-        <activity android:name="NoteActivity" android:label="@string/note_activity"></activity>
+        <activity android:name="NoteActivity" android:label="@string/note_activity_view"></activity>
         <meta-data android:name="com.google.android.gms.version"
            android:value="@integer/google_play_services_version" />
     </application>
