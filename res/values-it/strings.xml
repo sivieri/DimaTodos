@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="action_settings">Impostazioni</string>
+    <string name="add_note">Aggiungi nota</string>
+    <string name="list_name">title</string>
+    <string name="note_title_hint">Titolo</string>
+    <string name="note_content_hint">Contenuto</string>
+    <string name="note_activity_view">Vedi nota</string>
+    <string name="note_saved">Nota salvata</string>
+    <string name="note_discarded">Bozza eliminata</string>
+    <string name="note_context_edit">Modifica&#8230;</string>
+    <string name="note_context_delete">Elimina</string>
+    <string name="delete_dialog_title">Elimina nota</string>
+    <string name="delete_dialog_content">Eliminare la nota selezionata?</string>
+    <string name="delete_dialog_yes">Si</string>
+    <string name="delete_dialog_no">No</string>
+    <string name="edit_button">Modifica nota</string>
+    <string name="show_location">Mostra mappa</string>
+    <string name="add_image">Aggiungi foto&#8230;</string>
+    <string name="show_attachments">Mostra allegati</string>
+    <string name="note_location_hint">Dove ti trovi?</string>
+    <string name="picture__dialog_default">foto</string>
+    <string name="picture_dialog_title">Nuova foto</string>
+    <string name="picture_dialog_message">Titolo della foto:</string>
+    <string name="note_activity_edit">Modifica nota</string>
+
+</resources>
