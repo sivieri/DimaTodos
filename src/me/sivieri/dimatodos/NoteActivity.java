@@ -22,7 +22,9 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.FragmentActivity;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.ShareActionProvider;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.Menu;
@@ -39,7 +41,7 @@ import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.location.LocationClient;
 import com.google.common.io.ByteStreams;
 
-public class NoteActivity extends FragmentActivity implements CurrentEventLocationResult, GooglePlayServicesClient.ConnectionCallbacks, GooglePlayServicesClient.OnConnectionFailedListener {
+public class NoteActivity extends ActionBarActivity implements CurrentEventLocationResult, GooglePlayServicesClient.ConnectionCallbacks, GooglePlayServicesClient.OnConnectionFailedListener {
 
 	public static final String LOCATION = "location";
 	public static final String EDIT = "edit";
@@ -54,6 +56,7 @@ public class NoteActivity extends FragmentActivity implements CurrentEventLocati
 	private double latitude = 0;
 	private double longitude = 0;
 	private URI location = null;
+	private ShareActionProvider shareActionProvider = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -249,6 +252,7 @@ public class NoteActivity extends FragmentActivity implements CurrentEventLocati
 		contentView.showPrevious();
 		locationView.showPrevious();
 		setTitle(getString(R.string.note_activity_view));
+		prepareIntent();
 	}
 
 	private String substring(String string, int length) {
@@ -263,6 +267,9 @@ public class NoteActivity extends FragmentActivity implements CurrentEventLocati
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.editor, menu);
+		MenuItem menuItem = menu.findItem(R.id.share_note);
+		this.shareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(menuItem);
+		prepareIntent();
 
 		return true;
 	}
@@ -282,6 +289,16 @@ public class NoteActivity extends FragmentActivity implements CurrentEventLocati
 			default:
 				return super.onOptionsItemSelected(item);
 		}
+	}
+
+	private void prepareIntent() {
+		TextView titleText = (TextView) findViewById(R.id.titleText);
+		TextView contentText = (TextView) findViewById(R.id.contentText);
+		Intent sendIntent = new Intent();
+		sendIntent.setAction(Intent.ACTION_SEND);
+		sendIntent.putExtra(Intent.EXTRA_TEXT, titleText.getText().toString() + "\n" + contentText.getText().toString());
+		sendIntent.setType("text/plain");
+		this.shareActionProvider.setShareIntent(sendIntent);
 	}
 
 	private void showAttachments() {

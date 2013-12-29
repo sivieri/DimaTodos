@@ -23,5 +23,7 @@
     <string name="picture_dialog_title">Nuova foto</string>
     <string name="picture_dialog_message">Titolo della foto:</string>
     <string name="note_activity_edit">Modifica nota</string>
+    <string name="note_share_text">Condividi...</string>
+    <string name="note_share_chooser">Invia il contenuto a...</string>
 
 </resources>
