@@ -45,6 +45,7 @@ public class NoteActivity extends FragmentActivity implements CurrentEventLocati
 	public static final String EDIT = "edit";
 
 	private static final int ADD_IMAGE_INTENT = 100;
+	private static final int SHARED_TITLE_LIMIT = 15;
 
 	private Uri uri = null;
 	private boolean edit = false;
@@ -67,40 +68,51 @@ public class NoteActivity extends FragmentActivity implements CurrentEventLocati
 		EditText locationTextEdit = (EditText) findViewById(R.id.locationTextEdit);
 		contentText.setMovementMethod(new ScrollingMovementMethod());
 		contentTextEdit.setMovementMethod(new ScrollingMovementMethod());
-		Bundle extras = getIntent().getExtras();
+		Intent intent = getIntent();
+		String action = intent.getAction();
+		String type = intent.getType();
+		Bundle extras = intent.getExtras();
 		if (extras != null) {
-			this.uri = (Uri) extras.getParcelable(NoteListFragment.NOTE_ID);
-			this.edit = extras.getBoolean(EDIT);
-			this.getLocation = extras.getBoolean(LOCATION);
-			if (this.uri != null) {
-				String[] projection = { NotesOpenHelper.KEY, NotesOpenHelper.VALUE, NotesOpenHelper.LAT, NotesOpenHelper.LNG, NotesOpenHelper.LOCATION };
-				Cursor cursor = getContentResolver().query(this.uri, projection, null, null, null);
-				if (cursor != null) {
-					cursor.moveToFirst();
-					String title = cursor.getString(cursor.getColumnIndexOrThrow(NotesOpenHelper.KEY));
-					String content = cursor.getString(cursor.getColumnIndexOrThrow(NotesOpenHelper.VALUE));
-					String location = cursor.getString(cursor.getColumnIndexOrThrow(NotesOpenHelper.LOCATION));
-					this.latitude = cursor.getDouble(cursor.getColumnIndexOrThrow(NotesOpenHelper.LAT));
-					this.longitude = cursor.getDouble(cursor.getColumnIndexOrThrow(NotesOpenHelper.LNG));
-					titleText.setText(title);
-					contentText.setText(content);
-					locationText.setText(location);
-					titleTextEdit.setText(title);
-					contentTextEdit.setText(content);
-					locationTextEdit.setText(location);
-					cursor.close();
+			if (action != null && action.equals(Intent.ACTION_SEND) && type != null && type.startsWith("text")) {
+				// coming from external sources
+				String sharedText = extras.getString(Intent.EXTRA_TEXT);
+				if (sharedText != null) {
+					String sharedTitle = sharedText.substring(0, sharedText.length() >= SHARED_TITLE_LIMIT ? SHARED_TITLE_LIMIT : sharedText.length()).concat("...");
+					titleText.setText(sharedTitle);
+					contentText.setText(sharedText);
+					titleTextEdit.setText(sharedTitle);
+					contentTextEdit.setText(sharedText);
+					this.edit = true;
+					moveToEdit();
+					launchCalendarSearch();
 				}
 			}
-			if (this.edit) {
-				moveToEdit();
-				if (this.uri == null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-					Log.i(MainActivity.TAG, "Launching the calendar task...");
-					Calendar utc = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-					long current = utc.getTimeInMillis();
-					CurrentEventLocationTask task = new CurrentEventLocationTask();
-					task.setDelegate(this);
-					task.setContentResolver(getContentResolver());
-					task.execute(current);
+			else {
+				this.uri = (Uri) extras.getParcelable(NoteListFragment.NOTE_ID);
+				this.edit = extras.getBoolean(EDIT);
+				this.getLocation = extras.getBoolean(LOCATION);
+				if (this.uri != null) {
+					String[] projection = { NotesOpenHelper.KEY, NotesOpenHelper.VALUE, NotesOpenHelper.LAT, NotesOpenHelper.LNG, NotesOpenHelper.LOCATION };
+					Cursor cursor = getContentResolver().query(this.uri, projection, null, null, null);
+					if (cursor != null) {
+						cursor.moveToFirst();
+						String title = cursor.getString(cursor.getColumnIndexOrThrow(NotesOpenHelper.KEY));
+						String content = cursor.getString(cursor.getColumnIndexOrThrow(NotesOpenHelper.VALUE));
+						String location = cursor.getString(cursor.getColumnIndexOrThrow(NotesOpenHelper.LOCATION));
+						this.latitude = cursor.getDouble(cursor.getColumnIndexOrThrow(NotesOpenHelper.LAT));
+						this.longitude = cursor.getDouble(cursor.getColumnIndexOrThrow(NotesOpenHelper.LNG));
+						titleText.setText(title);
+						contentText.setText(content);
+						locationText.setText(location);
+						titleTextEdit.setText(title);
+						contentTextEdit.setText(content);
+						locationTextEdit.setText(location);
+						cursor.close();
+					}
+				}
+				if (this.edit) {
+					moveToEdit();
+					launchCalendarSearch();
 				}
 			}
 		}
@@ -114,6 +126,18 @@ public class NoteActivity extends FragmentActivity implements CurrentEventLocati
 			}
 
 		});
+	}
+
+	private void launchCalendarSearch() {
+		if (this.uri == null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+			Log.i(MainActivity.TAG, "Launching the calendar task...");
+			Calendar utc = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+			long current = utc.getTimeInMillis();
+			CurrentEventLocationTask task = new CurrentEventLocationTask();
+			task.setDelegate(this);
+			task.setContentResolver(getContentResolver());
+			task.execute(current);
+		}
 	}
 
 	@Override

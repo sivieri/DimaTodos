@@ -31,7 +31,13 @@
             android:exported="false"></provider>
         <provider android:authorities="me.sivieri.dimatodos.cameracontentprovider" android:name="CameraContentProvider"
             android:exported="false"></provider>
-        <activity android:name="NoteActivity" android:label="@string/note_activity_view"></activity>
+        <activity android:name="NoteActivity" android:label="@string/note_activity_view">
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:mimeType="text/*" />
+            </intent-filter>
+        </activity>
         <meta-data android:name="com.google.android.gms.version"
            android:value="@integer/google_play_services_version" />
     </application>

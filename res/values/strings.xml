@@ -7,7 +7,7 @@
     <string name="list_name">title</string>
     <string name="note_title_hint">Note title</string>
     <string name="note_content_hint">Note content</string>
-    <string name="note_activity_view">View note</string>
+    <string name="note_activity_view">DimaTodos - note</string>
     <string name="note_saved">Note saved</string>
     <string name="note_discarded">Note discarded</string>
     <string name="note_context_edit">Edit&#8230;</string>
