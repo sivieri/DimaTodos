@@ -30,3 +30,5 @@ Please, notice that to use this version (and the next ones) you need the Google 
 * Add the ActionBar (useful for the data sharing widgets)
 * Share note content with other applications
 * Receive shared input from other applications as note content
+* Moved application to fragments
+* Added new layout for tablets
