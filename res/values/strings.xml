@@ -27,5 +27,7 @@
     <string name="note_activity_edit">Edit note</string>
     <string name="note_share_text">Share...</string>
     <string name="note_share_chooser">Share note content to...</string>
+    <string name="save_note">Save</string>
+    <string name="note_restored">Note restored</string>
 
 </resources>

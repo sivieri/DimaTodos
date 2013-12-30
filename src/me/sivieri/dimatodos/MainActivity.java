@@ -2,31 +2,24 @@ package me.sivieri.dimatodos;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
-import android.support.v4.app.LoaderManager.LoaderCallbacks;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
-import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.app.ActionBarActivity;
-import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 
-public class MainActivity extends ActionBarActivity implements LoaderCallbacks<Cursor> {
+public class MainActivity extends ActionBarActivity implements OnNoteSelectedListener {
 
 	public static final String TAG = "dimatodos";
 
 	private static final int PLAY_ERROR = 1;
 
 	private LocationState locationState = LocationState.FIRST;
-	private SimpleCursorAdapter mAdapter;
 	private ProgressBar progressBar;
 
 	@Override
@@ -34,22 +27,12 @@ public class MainActivity extends ActionBarActivity implements LoaderCallbacks<C
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		ListFragment listFragment = (ListFragment) getSupportFragmentManager().findFragmentById(R.id.notesfragment);
-
 		this.progressBar = new ProgressBar(this);
 		this.progressBar.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 		this.progressBar.setIndeterminate(true);
 		listFragment.getListView().setEmptyView(this.progressBar);
-
-		ViewGroup root = (ViewGroup) findViewById(android.R.id.content);
+		ViewGroup root = (ViewGroup) this.findViewById(android.R.id.content);
 		root.addView(this.progressBar);
-
-		String[] fromColumns = { getString(R.string.list_name) };
-		int[] toViews = { android.R.id.text1 };
-
-		this.mAdapter = new SimpleCursorAdapter(this, android.R.layout.simple_list_item_1, null, fromColumns, toViews, 0);
-		listFragment.setListAdapter(this.mAdapter);
-
-		this.getSupportLoaderManager().initLoader(0, null, this);
 	}
 
 	@Override
@@ -81,22 +64,26 @@ public class MainActivity extends ActionBarActivity implements LoaderCallbacks<C
 	}
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.main, menu);
-
-		return true;
-	}
-
-	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case R.id.add_note:
-				Intent i = new Intent(this, NoteActivity.class);
-				i.putExtra(NoteActivity.EDIT, true);
-				if (this.locationState == LocationState.SET) {
-					i.putExtra(NoteActivity.LOCATION, true);
+				NoteFragment noteFragment = (NoteFragment) getSupportFragmentManager().findFragmentById(R.id.notefragment);
+				if (noteFragment == null) {
+					Intent i = new Intent(this, NoteActivity.class);
+					i.putExtra(NoteActivity.EDIT, true);
+					if (this.locationState == LocationState.SET) {
+						i.putExtra(NoteActivity.LOCATION, true);
+					}
+					startActivity(i);
 				}
-				startActivity(i);
+				else {
+					Bundle extras = new Bundle();
+					extras.putBoolean(NoteActivity.EDIT, true);
+					if (this.locationState == LocationState.SET) {
+						extras.putBoolean(NoteActivity.LOCATION, true);
+					}
+					noteFragment.updateContent(null, null, extras);
+				}
 				return true;
 			case R.id.settings:
 				return true;
@@ -105,27 +92,41 @@ public class MainActivity extends ActionBarActivity implements LoaderCallbacks<C
 		}
 	}
 
-	@Override
-	public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
-		String[] projection = { NotesOpenHelper.ID, NotesOpenHelper.KEY };
-		return new CursorLoader(this, NotesContentProvider.CONTENT_URI, projection, null, null, NotesOpenHelper.ID + " DESC");
-	}
-
-	@Override
-	public void onLoadFinished(Loader<Cursor> arg0, Cursor arg1) {
-		this.mAdapter.swapCursor(arg1);
-		if (arg1.getCount() == 0) {
-			this.progressBar.setVisibility(View.GONE);
-		}
-	}
-
-	@Override
-	public void onLoaderReset(Loader<Cursor> arg0) {
-		this.mAdapter.swapCursor(null);
+	public LocationState getLocationState() {
+		return this.locationState;
 	}
 
 	static enum LocationState {
 		FIRST, SET, UNSET
+	}
+
+	@Override
+	public void onNoteSelected(Uri uri) {
+		NoteFragment noteFragment = (NoteFragment) getSupportFragmentManager().findFragmentById(R.id.notefragment);
+		if (noteFragment == null) {
+			Intent i = new Intent(this, NoteActivity.class);
+			i.putExtra(MainFragment.NOTE_ID, uri);
+			if (this.locationState == LocationState.SET) {
+				i.putExtra(NoteActivity.LOCATION, true);
+			}
+			startActivity(i);
+		}
+		else {
+			Bundle extras = new Bundle();
+			extras.putParcelable(MainFragment.NOTE_ID, uri);
+			if (this.locationState == LocationState.SET) {
+				extras.putBoolean(NoteActivity.LOCATION, true);
+			}
+			noteFragment.updateContent(null, null, extras);
+		}
+	}
+
+	@Override
+	public void finish() {
+		NoteFragment noteFragment = (NoteFragment) getSupportFragmentManager().findFragmentById(R.id.notefragment);
+		if (noteFragment == null || noteFragment.exitingEdit()) {
+			super.finish();
+		}
 	}
 
 }
