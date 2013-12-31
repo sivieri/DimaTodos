@@ -24,13 +24,15 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
 import android.text.Html;
+import android.text.TextWatcher;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnKeyListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -42,6 +44,7 @@ public class SidebarFragment extends Fragment {
 	private static final String WIKITIONARY_ENDPOINT = ".wiktionary.org/w/api.php";
 	private static final String USER_AGENT = "DimaTodos/1.4 (PoliMi teaching app; alessandro.sivieri@polimi.it)";
 	private static final String LIMIT = "10";
+	private static final int DELAY = 2000;
 
 	private Map<String, String> codesToLanguagesMap = new HashMap<String, String>();
 	private Map<String, String> languagesToCodesMap = new HashMap<String, String>();
@@ -95,61 +98,71 @@ public class SidebarFragment extends Fragment {
 					});
 				}
 				catch (Exception e) {
-					Log.e(MainActivity.TAG, e.getLocalizedMessage());
+					e.printStackTrace();
 				}
 			}
 
 		}).start();
 		final ListView definitionsList = (ListView) getActivity().findViewById(R.id.definitionsList);
 		final EditText searchEdit = (EditText) getActivity().findViewById(R.id.wordEdit);
-		searchEdit.setOnKeyListener(new OnKeyListener() {
+		final Runnable filler = new Runnable() {
 
 			@Override
-			public boolean onKey(View arg0, int arg1, KeyEvent arg2) {
-				if (arg2.getAction() == KeyEvent.ACTION_DOWN && arg1 == KeyEvent.KEYCODE_ENTER) {
-					new Thread(new Runnable() {
+			public void run() {
+				String language = (String) spinner.getSelectedItem();
+				String code = SidebarFragment.this.languagesToCodesMap.get(language);
+				List<NameValuePair> params = new ArrayList<NameValuePair>();
+				params.add(new BasicNameValuePair("action", "query"));
+				params.add(new BasicNameValuePair("list", "search"));
+				params.add(new BasicNameValuePair("srsearch", searchEdit.getText().toString()));
+				params.add(new BasicNameValuePair("format", "json"));
+				params.add(new BasicNameValuePair("srprop", "snippet"));
+				params.add(new BasicNameValuePair("limit", LIMIT));
+				try {
+					String result = makeHttpRequest(code, params);
+					JSONObject main = new JSONObject(result);
+					JSONObject query = main.getJSONObject("query");
+					JSONArray pages = query.getJSONArray("search");
+					List<CharSequence> pagesHtml = new ArrayList<CharSequence>();
+					for (int i = 0; i < pages.length(); ++i) {
+						JSONObject page = pages.getJSONObject(i);
+						pagesHtml.add(Html.fromHtml(page.getString("snippet")));
+					}
+					final ArrayAdapter<CharSequence> adapter = new ArrayAdapter<CharSequence>(getActivity(), android.R.layout.simple_list_item_1, pagesHtml);
+					definitionsList.post(new Runnable() {
 
 						@Override
 						public void run() {
-							String language = (String) spinner.getSelectedItem();
-							String code = SidebarFragment.this.languagesToCodesMap.get(language);
-							List<NameValuePair> params = new ArrayList<NameValuePair>();
-							params.add(new BasicNameValuePair("action", "query"));
-							params.add(new BasicNameValuePair("list", "search"));
-							params.add(new BasicNameValuePair("srsearch", searchEdit.getText().toString()));
-							params.add(new BasicNameValuePair("format", "json"));
-							params.add(new BasicNameValuePair("srprop", "snippet"));
-							params.add(new BasicNameValuePair("limit", LIMIT));
-							try {
-								String result = makeHttpRequest(code, params);
-								JSONObject main = new JSONObject(result);
-								JSONObject query = main.getJSONObject("query");
-								JSONArray pages = query.getJSONArray("search");
-								List<CharSequence> pagesHtml = new ArrayList<CharSequence>();
-								for (int i = 0; i < pages.length(); ++i) {
-									JSONObject page = pages.getJSONObject(i);
-									pagesHtml.add(Html.fromHtml(page.getString("snippet")));
-								}
-								final ArrayAdapter<CharSequence> adapter = new ArrayAdapter<CharSequence>(getActivity(), android.R.layout.simple_list_item_1, pagesHtml);
-								definitionsList.post(new Runnable() {
-
-									@Override
-									public void run() {
-										definitionsList.setAdapter(adapter);
-									}
-
-								});
-							}
-							catch (Exception e) {
-								Log.e(MainActivity.TAG, e.getLocalizedMessage());
-							}
+							definitionsList.setAdapter(adapter);
 						}
 
-					}).start();
-					return true;
+					});
 				}
+				catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
 
-				return false;
+		};
+		HandlerThread handlerThread = new HandlerThread("watcher");
+		handlerThread.start();
+		final Handler handler = new Handler(handlerThread.getLooper());
+		searchEdit.addTextChangedListener(new TextWatcher() {
+
+			@Override
+			public void afterTextChanged(Editable arg0) {
+				handler.removeCallbacks(filler);
+				handler.postDelayed(filler, DELAY);
+			}
+
+			@Override
+			public void beforeTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
+				// not used
+			}
+
+			@Override
+			public void onTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
+				// not used
 			}
 
 		});
