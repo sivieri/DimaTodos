@@ -4,15 +4,27 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    <EditText
-        android:id="@+id/wordEdit"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="@string/sidebar_search" >
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
 
-        <requestFocus />
-    </EditText>
+        <EditText
+            android:id="@+id/wordEdit"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="@string/sidebar_search" />
+        
+        <Button
+			android:id="@+id/wordClear"
+			android:layout_width="30dip"
+			android:layout_height="30dip"
+			android:layout_alignParentRight="true"
+			android:background="@android:drawable/ic_input_delete"
+			android:layout_centerVertical="true"
+			android:layout_marginRight="5dip"/>
+
+    </RelativeLayout>
 
     <Spinner
         android:id="@+id/languageSpinner"
@@ -22,7 +34,7 @@
     <ListView
         android:id="@+id/definitionsList"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent" >
+        android:layout_height="fill_parent">
     </ListView>
 
 </LinearLayout>

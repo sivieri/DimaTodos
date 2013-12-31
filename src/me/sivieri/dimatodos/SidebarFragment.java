@@ -25,6 +25,7 @@ import org.json.JSONObject;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.Html;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -32,13 +33,18 @@ import android.view.View;
 import android.view.View.OnKeyListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.Spinner;
 
 public class SidebarFragment extends Fragment {
-	private static final String WIKITIONARY_LANGUAGES_ENDPOINT = "en.wiktionary.org/w/api.php";
-	private static final String WIKITIONARY_GENERIC_ENDPOINT = ".wiktionary.org/w/api.php";
+	private static final String WIKITIONARY_ENDPOINT = ".wiktionary.org/w/api.php";
 	private static final String USER_AGENT = "DimaTodos/1.4 (PoliMi teaching app; alessandro.sivieri@polimi.it)";
+	private static final String LIMIT = "10";
+
+	private Map<String, String> codesToLanguagesMap = new HashMap<String, String>();
+	private Map<String, String> languagesToCodesMap = new HashMap<String, String>();
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -64,18 +70,19 @@ public class SidebarFragment extends Fragment {
 				params.add(new BasicNameValuePair("siprop", "languages"));
 				params.add(new BasicNameValuePair("format", "json"));
 				try {
-					String result = makeHttpRequest(params);
+					// languages request to be done in the main Website
+					String result = makeHttpRequest("en", params);
 					JSONObject main = new JSONObject(result);
 					JSONObject query = main.getJSONObject("query");
 					JSONArray languages = query.getJSONArray("languages");
-					Map<String, String> languagesMap = new HashMap<String, String>();
 					for (int i = 0; i < languages.length(); ++i) {
 						JSONObject language = languages.getJSONObject(i);
-						languagesMap.put(language.getString("code"), language.getString("*"));
+						SidebarFragment.this.codesToLanguagesMap.put(language.getString("code"), language.getString("*"));
+						SidebarFragment.this.languagesToCodesMap.put(language.getString("*"), language.getString("code"));
 					}
 					String currentCode = Locale.getDefault().getLanguage();
-					final String currentLanguage = languagesMap.get(currentCode);
-					List<String> values = new ArrayList<String>(languagesMap.values());
+					final String currentLanguage = SidebarFragment.this.codesToLanguagesMap.get(currentCode);
+					List<String> values = new ArrayList<String>(SidebarFragment.this.codesToLanguagesMap.values());
 					final ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_dropdown_item, values);
 					spinner.post(new Runnable() {
 
@@ -93,13 +100,52 @@ public class SidebarFragment extends Fragment {
 			}
 
 		}).start();
-		EditText searchEdit = (EditText) getActivity().findViewById(R.id.wordEdit);
+		final ListView definitionsList = (ListView) getActivity().findViewById(R.id.definitionsList);
+		final EditText searchEdit = (EditText) getActivity().findViewById(R.id.wordEdit);
 		searchEdit.setOnKeyListener(new OnKeyListener() {
 
 			@Override
 			public boolean onKey(View arg0, int arg1, KeyEvent arg2) {
 				if (arg2.getAction() == KeyEvent.ACTION_DOWN && arg1 == KeyEvent.KEYCODE_ENTER) {
+					new Thread(new Runnable() {
 
+						@Override
+						public void run() {
+							String language = (String) spinner.getSelectedItem();
+							String code = SidebarFragment.this.languagesToCodesMap.get(language);
+							List<NameValuePair> params = new ArrayList<NameValuePair>();
+							params.add(new BasicNameValuePair("action", "query"));
+							params.add(new BasicNameValuePair("list", "search"));
+							params.add(new BasicNameValuePair("srsearch", searchEdit.getText().toString()));
+							params.add(new BasicNameValuePair("format", "json"));
+							params.add(new BasicNameValuePair("srprop", "snippet"));
+							params.add(new BasicNameValuePair("limit", LIMIT));
+							try {
+								String result = makeHttpRequest(code, params);
+								JSONObject main = new JSONObject(result);
+								JSONObject query = main.getJSONObject("query");
+								JSONArray pages = query.getJSONArray("search");
+								List<CharSequence> pagesHtml = new ArrayList<CharSequence>();
+								for (int i = 0; i < pages.length(); ++i) {
+									JSONObject page = pages.getJSONObject(i);
+									pagesHtml.add(Html.fromHtml(page.getString("snippet")));
+								}
+								final ArrayAdapter<CharSequence> adapter = new ArrayAdapter<CharSequence>(getActivity(), android.R.layout.simple_list_item_1, pagesHtml);
+								definitionsList.post(new Runnable() {
+
+									@Override
+									public void run() {
+										definitionsList.setAdapter(adapter);
+									}
+
+								});
+							}
+							catch (Exception e) {
+								Log.e(MainActivity.TAG, e.getLocalizedMessage());
+							}
+						}
+
+					}).start();
 					return true;
 				}
 
@@ -107,13 +153,23 @@ public class SidebarFragment extends Fragment {
 			}
 
 		});
+		Button clearButton = (Button) getActivity().findViewById(R.id.wordClear);
+		clearButton.setOnClickListener(new Button.OnClickListener() {
+
+			@Override
+			public void onClick(View arg0) {
+				searchEdit.setText("");
+				definitionsList.setAdapter(null);
+			}
+
+		});
 	}
 
-	public String makeHttpRequest(List<NameValuePair> params) throws ClientProtocolException, IOException {
+	public String makeHttpRequest(String code, List<NameValuePair> params) throws ClientProtocolException, IOException {
 		StringBuilder result = new StringBuilder();
 		HttpClient httpClient = new DefaultHttpClient();
 		String query = URLEncodedUtils.format(params, "utf-8");
-		HttpGet httpGet = new HttpGet("http://" + WIKITIONARY_LANGUAGES_ENDPOINT + "?" + query);
+		HttpGet httpGet = new HttpGet("http://" + code + WIKITIONARY_ENDPOINT + "?" + query);
 		httpGet.addHeader("User-Agent", USER_AGENT);
 		HttpResponse httpResponse = httpClient.execute(httpGet);
 		StatusLine statusLine = httpResponse.getStatusLine();
