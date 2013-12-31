@@ -32,3 +32,4 @@ Please, notice that to use this version (and the next ones) you need the Google 
 * Receive shared input from other applications as note content
 * Moved application to fragments
 * Added new layout for tablets
+* Added sidebar for online dictionary search
