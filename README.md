@@ -10,6 +10,8 @@ Android app tutorial for DIMA 2013 @ PoliMi
 * DimaTodos SQLite helper
 * DimaTodos content provider (introduction)
 
+This version requires the Android Support Library v4, which is automatically added by Eclipse ADT when a new project is created.
+
 # Lesson 2
 * DimaTodos content provider (continued)
 * DimaTodos note editor
@@ -33,3 +35,5 @@ Please, notice that to use this version (and the next ones) you need the Google 
 * Moved application to fragments
 * Added new layout for tablets
 * Added sidebar for online dictionary search
+
+This version requires the Android Support Library v7-appcompat, which has to be downloaded using the Android SDK Manager and imported in Eclipse ADT. Version 7 automatically includes version 4 (which can be removed from the dependency list).
