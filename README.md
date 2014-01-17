@@ -37,3 +37,7 @@ Please, notice that to use this version (and the next ones) you need the Google 
 * Added sidebar for online dictionary search
 
 This version requires the Android Support Library v7-appcompat, which has to be downloaded using the Android SDK Manager and imported in Eclipse ADT. Version 7 automatically includes version 4 (which can be removed from the dependency list).
+
+# Lesson 5
+* Open permissions for the notes content provider, to implement the widget
+* Added an [example widget](https://github.com/sivieri/DimaWidget)
