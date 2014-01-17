@@ -16,6 +16,9 @@
     <uses-feature android:name="android.hardware.camera" />
 
     <uses-permission android:name="android.permission.INTERNET" />
+    
+    <permission android:name="me.sivieri.dimatodos.NotesContentProvider.ACCESS_DATA"
+        android:protectionLevel="signature" />
 
     <application
         android:allowBackup="true"
@@ -35,7 +38,8 @@
         <provider
             android:name="NotesContentProvider"
             android:authorities="me.sivieri.dimatodos.notescontentprovider"
-            android:exported="false" >
+            android:exported="true"
+            android:permission="me.sivieri.dimatodos.NotesContentProvider.ACCESS_DATA" >
         </provider>
         <provider
             android:name="CameraContentProvider"
