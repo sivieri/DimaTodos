@@ -30,5 +30,7 @@
     <string name="save_note">Save</string>
     <string name="note_restored">Note restored</string>
     <string name="sidebar_search">Search&#8230;</string>
+    <string name="notes_sync">Synchronize</string>
+    <string name="notes_uploaded">Notes uploaded</string>
 
 </resources>

@@ -28,5 +28,7 @@
     <string name="save_note">Salva</string>
     <string name="note_restored">Nota ripristinata</string>
     <string name="sidebar_search">Cerca&#8230;</string>
+    <string name="notes_sync">Sincronizza</string>
+    <string name="notes_uploaded">Note caricate</string>
 
 </resources>
