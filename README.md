@@ -44,3 +44,4 @@ This version requires the Android Support Library v7-appcompat, which has to be 
 
 # Lesson 6
 * Google AppEngine backend (insertion only)
+* Added an [example backend](https://github.com/sivieri/DimaCloud)
