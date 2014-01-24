@@ -41,3 +41,6 @@ This version requires the Android Support Library v7-appcompat, which has to be 
 # Lesson 5
 * Open permissions for the notes content provider, to implement the widget
 * Added an [example widget](https://github.com/sivieri/DimaWidget)
+
+# Lesson 6
+* Google AppEngine backend (insertion only)
